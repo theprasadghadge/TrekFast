@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Trek - TrekFast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; }
+    h1,h2,h3 { font-family: 'Playfair Display', serif; }
+    /* ── field styles ── */
+    .fi { width:100%; padding:11px 14px; border:1px solid #d1d5db; border-radius:10px; font-size:0.9rem; outline:none; transition:border-color 0.2s; background:white; }
+    .fi:focus { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,0.1); }
+    .fl { display:block; font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:5px; }
+    /* ── step bar ── */
+    .step-bar { display:flex; }
+    .step { flex:1; text-align:center; padding:12px 4px; font-size:0.78rem; font-weight:600; color:#9ca3af; border-bottom:3px solid #e5e7eb; transition:all 0.25s; }
+    .step.active { color:#15803d; border-color:#15803d; }
+    .step.done   { color:#15803d; border-color:#86efac; opacity:0.7; }
+    /* ── spinner ── */
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spinner { display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Minimal header -->
+  <header class="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+    <div class="text-xl font-bold text-green-800 cursor-pointer" onclick="location.href='trek.html'">TrekFast</div>
+    <button onclick="location.href='trek.html'"
+      class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 transition">
+      &#8592; Back to Treks
+    </button>
+  </header>
+
+  <main class="flex-grow flex items-start justify-center px-4 py-10">
+    <div class="w-full max-w-6xl flex flex-col lg:flex-row gap-6 items-start">
+
+    <!-- ── RIGHT: My Bookings Panel ── -->
+    <div class="w-full lg:w-80 xl:w-96 flex-shrink-0 order-first lg:order-last">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-6">
+        <div class="px-5 py-4 bg-green-50 border-b border-green-100 flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-green-800 text-sm">My Previous Bookings</h3>
+            <p class="text-xs text-green-600 mt-0.5">Your booking history</p>
+          </div>
+          <span class="text-2xl">🏔️</span>
+        </div>
+
+        <!-- Not logged in -->
+        <div id="sbNotLoggedIn" class="hidden p-5 text-center">
+          <div class="text-3xl mb-2">🔒</div>
+          <p class="text-sm text-gray-500">Please <a href="login.html" class="text-green-700 font-semibold underline">login</a> to see your bookings.</p>
+        </div>
+
+        <!-- Loading skeleton -->
+        <div id="sbLoading" class="p-4 space-y-3">
+          <div class="animate-pulse flex gap-3">
+            <div class="bg-gray-200 rounded-xl w-14 h-14 flex-shrink-0"></div>
+            <div class="flex-1 space-y-2 pt-1">
+              <div class="bg-gray-200 h-3 rounded w-3/4"></div>
+              <div class="bg-gray-200 h-3 rounded w-1/2"></div>
+            </div>
+          </div>
+          <div class="animate-pulse flex gap-3">
+            <div class="bg-gray-200 rounded-xl w-14 h-14 flex-shrink-0"></div>
+            <div class="flex-1 space-y-2 pt-1">
+              <div class="bg-gray-200 h-3 rounded w-2/3"></div>
+              <div class="bg-gray-200 h-3 rounded w-1/3"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking list -->
+        <div id="sbList" class="hidden divide-y divide-gray-50 max-h-[480px] overflow-y-auto"></div>
+
+        <!-- Empty state -->
+        <div id="sbEmpty" class="hidden p-6 text-center">
+          <div class="text-3xl mb-2">🌄</div>
+          <p class="text-sm font-semibold text-gray-600 mb-1">No bookings yet!</p>
+          <p class="text-xs text-gray-400">Your confirmed treks will appear here.</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="sbError" class="hidden p-5 text-center">
+          <div class="text-2xl mb-2">⚠️</div>
+          <p class="text-xs text-red-500" id="sbErrorMsg">Could not load bookings.</p>
+          <button onclick="loadSidebarBookings()" class="mt-2 text-xs text-green-700 underline font-semibold">Retry</button>
+        </div>
+
+        <!-- View all link -->
+        <div id="sbFooter" class="hidden px-5 py-3 border-t border-gray-100 text-center">
+          <a href="mybooking.html" class="text-xs text-green-700 font-semibold hover:underline">View all bookings →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LEFT: Booking Form ── -->
+    <div class="flex-1 min-w-0">
+
+      <!-- Trek summary card -->
+      <div id="trekSummaryCard" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex gap-4 items-center">
+        <img id="summaryImg" src="" alt="trek"
+          class="w-20 h-20 rounded-xl object-cover flex-shrink-0"
+          onerror="this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=60'">
+        <div class="flex-grow">
+          <h2 class="text-lg font-bold text-gray-800" id="summaryName">Loading...</h2>
+          <p class="text-sm text-gray-500" id="summaryLocation"></p>
+          <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+            <span id="summaryDuration"></span>
+            <span id="summaryDifficulty"></span>
+          </div>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Price</p>
+          <p class="text-2xl font-bold text-green-700">&#8377;<span id="summaryPrice">0</span></p>
+          <p class="text-xs text-gray-400">per person</p>
+        </div>
+      </div>
+
+      <!-- Booking form card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+        <!-- Step bar -->
+        <div class="step-bar border-b border-gray-100">
+          <div class="step active" id="step1bar">1&nbsp;Personal</div>
+          <div class="step" id="step2bar">2&nbsp;ID &amp; Emergency</div>
+          <div class="step" id="step3bar">3&nbsp;Risk &amp; Pay</div>
+        </div>
+
+        <div class="p-7">
+
+          <!-- ── STEP 1 ── -->
+          <div id="step1">
+            <!-- Participant selector -->
+            <div class="bg-green-50 rounded-xl p-4 mb-6 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Participants</p>
+                <div class="flex items-center gap-4">
+                  <button onclick="changePax(-1)"
+                    class="w-9 h-9 rounded-full bg-white border border-gray-300 text-gray-600 font-bold hover:border-green-600 hover:text-green-700 transition text-lg flex items-center justify-center">&#8722;</button>
+                  <span id="paxCount" class="text-xl font-bold text-gray-800">1</span>
+                  <button onclick="changePax(1)"
+                    class="w-9 h-9 rounded-full bg-white border border-gray-300 text-gray-600 font-bold hover:border-green-600 hover:text-green-700 transition text-lg flex items-center justify-center">+</button>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</p>
+                <p class="text-3xl font-bold text-green-700 mt-1">&#8377;<span id="totalDisplay">0</span></p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div><label class="fl">Full Name *</label><input id="bkName" class="fi" type="text" placeholder="Your full name"></div>
+                <div><label class="fl">Age *</label><input id="bkAge" class="fi" type="number" placeholder="e.g. 25" min="5" max="80"></div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="fl">Gender *</label>
+                  <select id="bkGender" class="fi">
+                    <option value="">-- Select --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div><label class="fl">Phone Number *</label><input id="bkPhone" class="fi" type="tel" placeholder="9876543210"></div>
+              </div>
+              <div><label class="fl">Email Address *</label><input id="bkEmail" class="fi" type="email" placeholder="you@email.com"></div>
+              <div><label class="fl">Full Address *</label><textarea id="bkAddress" class="fi" rows="2" placeholder="House no, Street, City, State, PIN"></textarea></div>
+            </div>
+
+            <div id="err1" class="hidden text-red-600 text-sm bg-red-50 px-4 py-2 rounded-xl mt-4"></div>
+            <button onclick="goStep(2)"
+              class="mt-6 w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl transition text-base">
+              Next &rarr;
+            </button>
+          </div>
+
+          <!-- ── STEP 2 ── -->
+          <div id="step2" class="hidden">
+            <div class="space-y-4">
+              <div>
+                <label class="fl">Aadhar Card Number *</label>
+                <input id="bkAadhar" class="fi" type="text" maxlength="14" placeholder="XXXX XXXX XXXX"
+                  oninput="formatAadhar(this)">
+              </div>
+              <div><label class="fl">Emergency Contact Name *</label><input id="bkEmgName" class="fi" type="text" placeholder="Parent / Guardian / Friend name"></div>
+              <div><label class="fl">Emergency Mobile Number *</label><input id="bkEmgPhone" class="fi" type="tel" placeholder="9876543210"></div>
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mt-5 text-sm text-yellow-800">
+              <strong>&#9432; Why we need this?</strong> Emergency contacts are only used in case of a medical emergency or accident during the trek.
+            </div>
+
+            <div id="err2" class="hidden text-red-600 text-sm bg-red-50 px-4 py-2 rounded-xl mt-4"></div>
+            <div class="flex gap-3 mt-6">
+              <button onclick="goStep(1)" class="flex-1 border border-gray-300 text-gray-600 font-semibold py-3.5 rounded-xl hover:bg-gray-50 transition">&larr; Back</button>
+              <button onclick="goStep(3)" class="flex-[2] bg-green-700 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl transition">Next &rarr;</button>
+            </div>
+          </div>
+
+          <!-- ── STEP 3 ── -->
+          <div id="step3" class="hidden">
+
+            <!-- Risk disclaimer -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-5 mb-5">
+              <h3 class="text-red-700 font-bold mb-3 flex items-center gap-2">
+                <span class="text-lg">&#9888;</span> Risk Acknowledgement &amp; Disclaimer
+              </h3>
+              <div class="text-xs text-gray-700 space-y-2 max-h-52 overflow-y-auto pr-1 leading-relaxed">
+                <p>Trekking involves physical exertion and exposure to natural elements including rough terrain, extreme weather, altitude sickness, wildlife, and unforeseen emergencies.</p>
+                <p><strong>By proceeding, I acknowledge and agree to the following:</strong></p>
+                <ul class="list-disc pl-4 space-y-1.5">
+                  <li>I am voluntarily participating in this trek and am physically fit to do so.</li>
+                  <li>I am participating <strong>entirely at my own risk</strong> and on my own responsibility.</li>
+                  <li>In the event of any accident, injury, illness, loss, damage, or death, <strong>TrekFast and its organizers shall NOT be held liable or responsible</strong> in any manner whatsoever.</li>
+                  <li>TrekFast does not provide insurance. I am responsible for arranging my own travel/medical insurance if required.</li>
+                  <li>I agree to follow all safety instructions given by the trek guide and organizer at all times.</li>
+                  <li>I confirm all information provided is accurate and true to the best of my knowledge.</li>
+                  <li>Trek routes, dates, and itineraries may change due to weather, safety, or circumstances beyond the organizer's control, with no liability to TrekFast.</li>
+                </ul>
+                <p class="font-bold text-red-600 mt-3 text-center text-xs">
+                  TREKFAST &amp; THE ORGANIZER ARE NOT RESPONSIBLE FOR ANY ACCIDENT, INJURY, OR LOSS.<br>
+                  PARTICIPATION IS ENTIRELY AT YOUR OWN RISK.
+                </p>
+              </div>
+            </div>
+
+            <!-- Acknowledgement checkbox -->
+            <label class="flex items-start gap-3 cursor-pointer bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition">
+              <input type="checkbox" id="riskCheck" class="w-4 h-4 accent-green-600 mt-0.5 flex-shrink-0">
+              <span class="text-xs text-gray-700 leading-relaxed">
+                I have carefully read and fully understood the Risk Acknowledgement &amp; Disclaimer above.
+                I voluntarily accept all risks and confirm that <strong>TrekFast and the organizer are not responsible</strong>
+                for any accident, injury, or loss that may occur. I am participating entirely at my own risk.
+              </span>
+            </label>
+
+            <!-- Order summary -->
+            <div class="bg-gray-50 rounded-xl p-4 mt-5 flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-gray-600" id="summaryLine">1 participant</p>
+                <p class="text-xs text-gray-400">All charges included</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-gray-400 font-medium uppercase tracking-wide">Total Payable</p>
+                <p class="text-2xl font-bold text-green-700">&#8377;<span id="finalTotal">0</span></p>
+              </div>
+            </div>
+
+            <div id="err3" class="hidden text-red-600 text-sm bg-red-50 px-4 py-2 rounded-xl mt-4"></div>
+
+            <div class="flex gap-3 mt-6">
+              <button onclick="goStep(2)" class="flex-1 border border-gray-300 text-gray-600 font-semibold py-3.5 rounded-xl hover:bg-gray-50 transition">&larr; Back</button>
+              <button id="payBtn" onclick="proceedToPayment()"
+                class="flex-[2] bg-green-700 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl transition text-base">
+                &#x1F4B3; Pay &#8377;<span id="payBtnAmt">0</span>
+              </button>
+            </div>
+
+            <p class="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
+              &#128274; 100% Secured by Razorpay &bull; Your payment info is never stored
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- end form card -->
+    </div><!-- end flex-1 left column -->
+    </div><!-- end flex row -->
+  </main>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    // ── Read trek data from URL params ────────────────────────────────────────
+    // trek.html passes: ?trekId=...&trekName=...&price=...&maxPax=...&image=...&location=...&duration=...&difficulty=...
+    const API = "https://YOUR_VERCEL_BACKEND_URL";
+    const params = new URLSearchParams(window.location.search);
+
+    const _trek = {
+      id:         params.get("trekId")     || "",
+      name:       params.get("trekName")   || "Trek",
+      price:      Number(params.get("price") || 0),
+      maxPax:     Number(params.get("maxPax") || 20),
+      image:      params.get("image")      || "",
+      location:   params.get("location")   || "",
+      duration:   params.get("duration")   || "",
+      difficulty: params.get("difficulty") || "",
+    };
+
+    let _pax   = 1;
+    let _total = _trek.price;
+
+    // ── Populate summary card ─────────────────────────────────────────────────
+    document.getElementById("summaryImg").src         = _trek.image || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=60";
+    document.getElementById("summaryName").textContent     = _trek.name;
+    document.getElementById("summaryLocation").textContent = _trek.location;
+    document.getElementById("summaryDuration").textContent = _trek.duration ? "⏱ " + _trek.duration : "";
+    document.getElementById("summaryDifficulty").textContent = _trek.difficulty ? "🏔 " + _trek.difficulty : "";
+    document.getElementById("summaryPrice").textContent    = Number(_trek.price).toLocaleString("en-IN");
+
+    // Pre-fill email from localStorage (user already logged in)
+    const savedEmail = localStorage.getItem("userEmail");
+    const savedName  = localStorage.getItem("userName");
+    if (savedEmail) document.getElementById("bkEmail").value = savedEmail;
+    if (savedName)  document.getElementById("bkName").value  = savedName;
+
+    updateTotals();
+
+    // ── Participant counter ───────────────────────────────────────────────────
+    function changePax(d) {
+      _pax = Math.min(_trek.maxPax, Math.max(1, _pax + d));
+      document.getElementById("paxCount").textContent = _pax;
+      updateTotals();
+    }
+
+    function updateTotals() {
+      _total = _trek.price * _pax;
+      const fmt = _total.toLocaleString("en-IN");
+      document.getElementById("totalDisplay").textContent = fmt;
+      document.getElementById("finalTotal").textContent   = fmt;
+      document.getElementById("payBtnAmt").textContent    = fmt;
+      document.getElementById("summaryLine").textContent  = `${_pax} participant${_pax !== 1 ? "s" : ""} × ₹${_trek.price.toLocaleString("en-IN")}`;
+    }
+
+    // ── Aadhar formatter (XXXX XXXX XXXX) ────────────────────────────────────
+    function formatAadhar(el) {
+      let v = el.value.replace(/\D/g, "").slice(0, 12);
+      el.value = v.replace(/(.{4})/g, "$1 ").trim();
+    }
+
+    // ── Step navigation ───────────────────────────────────────────────────────
+    function showStep(n) {
+      [1,2,3].forEach(i => {
+        document.getElementById("step"+i).classList.add("hidden");
+        document.getElementById("step"+i+"bar").className = "step";
+      });
+      document.getElementById("step"+n).classList.remove("hidden");
+      document.getElementById("step"+n+"bar").classList.add("active");
+      for (let i = 1; i < n; i++) document.getElementById("step"+i+"bar").classList.add("done");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goStep(n) {
+      if (n === 2) {
+        const nm = v("bkName"), ag = v("bkAge"), gd = document.getElementById("bkGender").value;
+        const ph = v("bkPhone"), em = v("bkEmail"), ad = v("bkAddress");
+        if (!nm||!ag||!gd||!ph||!em||!ad) { showErr(1,"Please fill in all required fields."); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showErr(1,"Enter a valid email address."); return; }
+        if (!/^\d{10}$/.test(ph.replace(/\D/g,"")))  { showErr(1,"Enter a valid 10-digit phone number."); return; }
+        if (Number(ag) < 5 || Number(ag) > 80)        { showErr(1,"Age must be between 5 and 80."); return; }
+      }
+      if (n === 3) {
+        const aa = v("bkAadhar").replace(/\s/g,""), en = v("bkEmgName"), ep = v("bkEmgPhone");
+        if (!aa||!en||!ep)                             { showErr(2,"Please fill in all fields."); return; }
+        if (!/^\d{12}$/.test(aa))                     { showErr(2,"Aadhar must be exactly 12 digits."); return; }
+        if (!/^\d{10}$/.test(ep.replace(/\D/g,"")))   { showErr(2,"Enter a valid 10-digit emergency phone number."); return; }
+      }
+      showStep(n);
+    }
+
+    function v(id) { return document.getElementById(id).value.trim(); }
+    function showErr(step, msg) {
+      const el = document.getElementById("err"+step);
+      el.textContent = msg;
+      el.classList.remove("hidden");
+      setTimeout(() => el.classList.add("hidden"), 5000);
+    }
+
+    // ── Razorpay Payment ──────────────────────────────────────────────────────
+    async function proceedToPayment() {
+      if (!document.getElementById("riskCheck").checked) {
+        showErr(3, "You must read and accept the Risk Acknowledgement to proceed.");
+        return;
+      }
+      if (!_trek.id) {
+        showErr(3, "Trek information missing. Please go back and try again.");
+        return;
+      }
+
+      const btn = document.getElementById("payBtn");
+      btn.disabled = true;
+      btn.innerHTML = `Processing... <span class="spinner"></span>`;
+
+      const payload = {
+        trekId:         _trek.id,
+        participants:   _pax,
+        trekkerName:    v("bkName"),
+        trekkerEmail:   v("bkEmail"),
+        trekkerPhone:   v("bkPhone"),
+        emergencyPhone: v("bkEmgPhone"),
+        age:            Number(v("bkAge")),
+        gender:         document.getElementById("bkGender").value,
+        address:        v("bkAddress"),
+        aadharNumber:   v("bkAadhar").replace(/\s/g,""),
+        riskAcknowledged: true,
+      };
+
+      const resetBtn = () => {
+        btn.disabled = false;
+        btn.innerHTML = `&#x1F4B3; Pay &#8377;${_total.toLocaleString("en-IN")}`;
+      };
+
+      try {
+        const token = localStorage.getItem("token");
+        const res  = await fetch(`${API}/create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok) { showErr(3, data.message || "Order creation failed."); resetBtn(); return; }
+
+        const options = {
+          key:         data.keyId,
+          amount:      data.amount,
+          currency:    data.currency,
+          name:        "TrekFast",
+          description: data.trekName,
+          order_id:    data.orderId,
+          prefill:     { name: payload.trekkerName, email: payload.trekkerEmail, contact: payload.trekkerPhone },
+          theme:       { color: "#15803d" },
+          handler: async (response) => {
+            const vRes  = await fetch(`${API}/verify-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("token")}` },
+              body: JSON.stringify({
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature:  response.razorpay_signature,
+                bookingId:           data.bookingId,
+              })
+            });
+            const vData = await vRes.json();
+
+            if (vRes.ok) {
+              // Redirect to mybooking with success param
+              window.location.href = `mybooking.html?success=1&payId=${response.razorpay_payment_id}&trek=${encodeURIComponent(data.trekName)}`;
+            } else {
+              showErr(3, "Payment verification failed: " + vData.message);
+              resetBtn();
+            }
+          },
+          modal: { ondismiss: resetBtn }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on("payment.failed", r => { showErr(3, "Payment failed: " + r.error.description); resetBtn(); });
+        rzp.open();
+
+      } catch (e) {
+        showErr(3, "Server error. Please try again.");
+        resetBtn();
+      }
+    }
+  </script>
+
+  <script>
+    function doLogout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <!-- ── Sidebar: My Bookings ── -->
+  <script>
+    const SB_API    = "https://YOUR_VERCEL_BACKEND_URL";
+    const SB_DEFIMG = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=60";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        document.getElementById("sbLoading").classList.add("hidden");
+        document.getElementById("sbNotLoggedIn").classList.remove("hidden");
+        return;
+      }
+      loadSidebarBookings();
+    });
+
+    async function loadSidebarBookings() {
+      // reset states
+      ["sbNotLoggedIn","sbList","sbEmpty","sbError","sbFooter"].forEach(id =>
+        document.getElementById(id).classList.add("hidden")
+      );
+      document.getElementById("sbLoading").classList.remove("hidden");
+
+      try {
+        const token = localStorage.getItem("token");
+        const res   = await fetch(`${SB_API}/mybookings`, {
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+        });
+
+        document.getElementById("sbLoading").classList.add("hidden");
+
+        if (res.status === 401) {
+          document.getElementById("sbNotLoggedIn").classList.remove("hidden");
+          return;
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Server error");
+
+        const bookings = Array.isArray(data) ? data : [];
+
+        if (bookings.length === 0) {
+          document.getElementById("sbEmpty").classList.remove("hidden");
+          return;
+        }
+
+        // Show up to 5 most recent
+        const recent = bookings.slice(0, 5);
+        const list   = document.getElementById("sbList");
+
+        list.innerHTML = recent.map(b => {
+          const expired  = b.trekEndDate ? new Date(b.trekEndDate) < new Date()
+                         : b.trekDate    ? new Date(b.trekDate)    < new Date()
+                         : false;
+          const isFailed  = b.status === "failed";
+          const isPending = b.status === "pending";
+
+          const badgeCls = isFailed  ? "bg-red-100 text-red-600"
+                         : isPending ? "bg-yellow-100 text-yellow-700"
+                         : expired   ? "bg-gray-100 text-gray-500"
+                         : "bg-green-100 text-green-700";
+          const badgeTxt = isFailed  ? "Failed"
+                         : isPending ? "Pending"
+                         : expired   ? "Expired"
+                         : "✅ Active";
+
+          const bookedOn = new Date(b.createdAt).toLocaleDateString("en-IN", {
+            day: "numeric", month: "short", year: "numeric"
+          });
+
+          return `
+          <div class="flex gap-3 p-4 hover:bg-gray-50 transition">
+            <img src="${b.trekImage || SB_DEFIMG}" alt="${b.trekName}"
+              class="w-14 h-14 rounded-xl object-cover flex-shrink-0 ${expired ? 'opacity-60 grayscale' : ''}"
+              onerror="this.src='${SB_DEFIMG}'">
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-800 text-sm truncate">${b.trekName}</p>
+              <p class="text-xs text-gray-400 mt-0.5">${b.trekDate || "Date TBD"}</p>
+              <div class="flex items-center justify-between mt-1.5 gap-2">
+                <span class="text-xs font-bold text-green-700">₹${(b.amountPaid || 0).toLocaleString("en-IN")}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${badgeCls}">${badgeTxt}</span>
+              </div>
+              <p class="text-xs text-gray-300 mt-1">Booked ${bookedOn}</p>
+            </div>
+          </div>`;
+        }).join("");
+
+        list.classList.remove("hidden");
+
+        if (bookings.length > 5) {
+          document.getElementById("sbFooter").classList.remove("hidden");
+          document.querySelector("#sbFooter a").textContent =
+            `View all ${bookings.length} bookings →`;
+        } else if (bookings.length > 0) {
+          document.getElementById("sbFooter").classList.remove("hidden");
+        }
+
+      } catch (e) {
+        document.getElementById("sbLoading").classList.add("hidden");
+        document.getElementById("sbError").classList.remove("hidden");
+        document.getElementById("sbErrorMsg").textContent = e.message || "Could not load bookings.";
+      }
+    }
+  </script>
+</body>
+</html>

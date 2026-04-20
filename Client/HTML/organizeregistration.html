@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organizer Registration</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../JS/OrganizerFrontendReg.js" defer></script>
+
+  <style>
+    .input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      outline: none;
+      transition: .2s;
+    }
+
+    .input:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 2px #bbf7d0;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(18px);
+      border-radius: 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, .35);
+    }
+
+    .glow-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      transition: .25s;
+    }
+
+    .glow-btn:hover {
+      box-shadow: 0 0 20px #22c55e;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-3"
+  style="background:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') center/cover no-repeat">
+
+  <div class="absolute inset-0"></div>
+
+  <form id="organizerForm"
+    onsubmit="handleOrganizerRegister(event)"
+    enctype="multipart/form-data"
+    class="relative w-full max-w-[1400px] glass p-6 space-y-4">
+
+    <h2 class="text-3xl font-bold text-center text-green-800">
+      Organizer Registration
+    </h2>
+
+    <!-- ROW 1: Names + Email + OTP -->
+    <div class="grid lg:grid-cols-5 md:grid-cols-5 gap-3">
+      <input id="firstName" placeholder="First Name" required class="input" />
+      <input id="middleName" placeholder="Middle Name" class="input" />
+      <input id="surname" placeholder="Surname" required class="input" />
+
+      <div class="relative">
+        <input type="email" id="email" placeholder="Email Address" required class="input pr-32" />
+        <button type="button"
+          onclick="getOTP()"
+          class="absolute right-1 top-1/2 -translate-y-1/2 bg-green-600 text-white px-4 py-1 rounded-lg hover:bg-green-700">
+          Get OTP
+        </button>
+      </div>
+
+      <input type="number" id="otp" placeholder="Enter OTP" required class="input" />
+    </div>
+
+    <!-- ROW 2: Mobile + Passwords + Org Info + Experience -->
+    <div class="grid lg:grid-cols-5 md:grid-cols-5 gap-3">
+      <input type="tel" id="mobile" placeholder="Mobile Number" required class="input" />
+      <input type="password" id="password" placeholder="Password" required class="input" />
+      <input type="password" id="cpassword" placeholder="Confirm Password" required class="input" />
+      <input id="orgName" placeholder="Organization Name" required class="input" />
+      <input type="number" id="experience" placeholder="Experience (Years)" required class="input" />
+    </div>
+
+    <!-- REST ORGANIZATION DETAILS -->
+    <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-3">
+      <textarea id="address" rows="2" placeholder="Full Address" required class="input lg:col-span-3"></textarea>
+      <input id="website" placeholder="Website / Instagram / Facebook" class="input lg:col-span-3" />
+      <input id="region" placeholder="Operating Region / Trek Locations" required class="input lg:col-span-2" />
+      <input id="emergencyPerson" placeholder="Emergency Contact Person" required class="input" />
+      <input id="emergencyNumber" placeholder="Emergency Contact Number" required class="input" />
+      <input id="certifications" placeholder="Safety Certifications" class="input" />
+      <select id="firstAid" class="input">
+        <option value="">First Aid Available?</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+      <select id="medical" class="input">
+        <option value="">Medical Support?</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>
+
+    <!-- DOCUMENT UPLOAD -->
+    <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-3">
+      <div>
+        <label class="block font-medium text-slate-700">Personal ID</label>
+        <input type="file" id="personalId" required class="input" />
+      </div>
+      <div>
+        <label class="block font-medium text-slate-700">Organization Registration</label>
+        <input type="file" id="orgRegistrationDoc" required class="input" />
+      </div>
+      <div>
+        <label class="block font-medium text-slate-700">Experience Proof (Optional)</label>
+        <input type="file" id="experienceProof" class="input" />
+      </div>
+    </div>
+
+    <!-- TERMS -->
+    <div class="flex items-center gap-2 text-sm">
+      <input type="checkbox" id="terms" required class="accent-green-600 scale-110">
+      <label>I agree to the Terms & Conditions</label>
+    </div>
+
+    <!-- SUBMIT -->
+    <button type="submit"
+      class="w-full glow-btn text-white py-3 rounded-xl font-semibold">
+      Register
+    </button>
+
+  </form>
+</body>
+
+</html>
