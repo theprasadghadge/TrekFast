@@ -28,7 +28,7 @@ async function sendOTPWithSpinner() {
   status.classList.add("hidden");
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/sendotp", {
+    const res = await fetch("http://localhost:3000/sendotp", {
       method: "POST",
       headers: { "Content-Type":"application/json" },
       body: JSON.stringify({ email })
@@ -61,7 +61,7 @@ async function verifyOTP() {
   if (!otp) return alert("Enter OTP");
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/verifyotp", {
+    const res = await fetch("http://localhost:3000/verifyotp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ otp })
@@ -121,7 +121,7 @@ async function handleRegister(e) {
   submitBtn.innerHTML = `Registering... <span id="registerSpinner" style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-left:4px;"></span>`;
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/register", {
+    const res = await fetch("http://localhost:3000/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData)

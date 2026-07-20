@@ -21,10 +21,10 @@ form.addEventListener("submit", async function (e) {
 
   try {
 
-    const response = await fetch("https://YOUR_VERCEL_BACKEND_URL/contact", {
+    const response = await fetch("http://localhost:3000/contact", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type":"application/json"
       },
       body: JSON.stringify(formData)
     });
@@ -32,7 +32,6 @@ form.addEventListener("submit", async function (e) {
     const result = await response.json();
 
     alert(result.message || "Message Sent Successfully");
-
     form.reset();
 
   } catch (error) {

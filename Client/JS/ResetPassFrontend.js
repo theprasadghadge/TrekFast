@@ -19,7 +19,7 @@ async function sendResetOTP() {
   status.classList.add("hidden");
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/send-reset-otp", {
+    const res = await fetch("http://localhost:3000/send-reset-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, userType: getUserType() })
@@ -79,7 +79,7 @@ document.getElementById("forgotForm").addEventListener("submit", async (e) => {
   try {
 
     // ===== Verify OTP =====
-    const verifyRes = await fetch("https://YOUR_VERCEL_BACKEND_URL/verify-reset-otp", {
+    const verifyRes = await fetch("http://localhost:3000/verify-reset-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp })
@@ -98,7 +98,7 @@ document.getElementById("forgotForm").addEventListener("submit", async (e) => {
     }
 
     // ===== Reset Password =====
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/reset-password", {
+    const res = await fetch("http://localhost:3000/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, newPassword, userType })

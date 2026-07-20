@@ -4,7 +4,7 @@ async function getOTP() {
   if (!email) return alert("Enter your email");
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/sendotp", {
+    const res = await fetch("http://localhost:3000/sendotp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
@@ -28,7 +28,7 @@ async function verifyOTP() {
   if (!email) return alert("Email missing");
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/verifyotp", {
+    const res = await fetch("http://localhost:3000/verifyotp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp })
@@ -105,7 +105,7 @@ async function handleOrganizerRegister(e) {
   };
 
   try {
-    const res = await fetch("https://YOUR_VERCEL_BACKEND_URL/organizeregistration", {
+    const res = await fetch("http://localhost:3000/organizeregistration", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(organizerData)
