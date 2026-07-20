@@ -1,6 +1,6 @@
 import express from "express";
 import { registerUser } from "../Controller/Register.js";
-import { loginUser } from "../Controller/Login.js";
+import { loginUser } from "../Controller/index.js";
 import { registerOrganizer } from "../Controller/OrganizerReg.js";
 import { sendOTP, verifyOTP } from "../Controller/OtpSend.js";
 import { createContact } from "../Controller/contact.js";
