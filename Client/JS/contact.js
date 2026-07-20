@@ -21,7 +21,7 @@ form.addEventListener("submit", async function (e) {
 
   try {
 
-    const response = await fetch("http://localhost:3000/contact", {
+    const response = await fetch("https://trekfast.onrender.com/contact", {
       method: "POST",
       headers: {
         "Content-Type":"application/json"

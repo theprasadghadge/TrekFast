@@ -4,7 +4,7 @@ async function getOTP() {
   if (!email) return alert("Enter your email");
 
   try {
-    const res = await fetch("http://localhost:3000/sendotp", {
+    const res = await fetch("https://trekfast.onrender.com/sendotp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
@@ -28,7 +28,7 @@ async function verifyOTP() {
   if (!email) return alert("Email missing");
 
   try {
-    const res = await fetch("http://localhost:3000/verifyotp", {
+    const res = await fetch("https://trekfast.onrender.com/verifyotp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp })
@@ -105,7 +105,7 @@ async function handleOrganizerRegister(e) {
   };
 
   try {
-    const res = await fetch("http://localhost:3000/organizeregistration", {
+    const res = await fetch("https://trekfast.onrender.com/organizeregistration", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(organizerData)
