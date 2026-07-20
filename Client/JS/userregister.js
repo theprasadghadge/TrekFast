@@ -132,7 +132,7 @@ async function handleRegister(e) {
 
     if (res.ok) {
       setTimeout(() => {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
       }, 500);
     }
 
