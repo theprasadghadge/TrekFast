@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - TrekFast Organizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; }
+    h1,h2,h3 { font-family: 'Playfair Display', serif; }
+    nav ul li { position: relative; cursor: pointer; }
+    nav ul li::after { content:""; position:absolute; left:0; bottom:-6px; width:0; height:2px; background-color:#16a34a; border-radius:999px; transition:width 0.35s ease; }
+    nav ul li:hover::after { width:100%; }
+    .footer a:hover { color:#16a34a; }
+    .stat-card { background:white; border-radius:16px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.07); border-left:4px solid; }
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+  </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+<nav class="flex items-center justify-between px-6 md:px-10 py-5 shadow-md bg-white sticky top-0 z-40">
+  <div class="text-2xl font-bold text-green-800 cursor-pointer" onclick="location.href='orgnizerhome.html'">TrekFast</div>
+  <ul class="hidden md:flex items-center gap-8 lg:gap-10 text-gray-600 font-medium">
+    <li onclick="location.href='orgnizerhome.html'">Home</li>
+    <li onclick="location.href='orgtreks.html'">Trek</li>
+    <li onclick="location.href='yourtrek.html'">Your Trek</li>
+    <li class="text-green-700 font-semibold">Dashboard</li>
+    <li onclick="location.href='about.html'">About Us</li>
+    <li onclick="location.href='contact.html'">Contact Us</li>
+  </ul>
+  <div class="flex gap-4">
+    <button class="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition" onclick="location.href='yourtrek.html'">Organize Trek</button>
+    <button class="bg-gray-200 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm" onclick="doLogout()">Logout</button>
+  </div>
+    <button class="md:hidden flex flex-col gap-1.5 p-2" onclick="toggleMenu()">
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+    </button>
+  </nav>
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" style="display:none" class="md:hidden flex-col bg-white border-b border-gray-100 shadow-sm px-6 pb-4 gap-1 z-30">
+    <a href="orgnizerhome.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Home</a>
+    <a href="orgtreks.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Treks</a>
+    <a href="yourtrek.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Your Trek</a>
+    <a href="dashboard.html" class="py-2.5 text-green-700 font-semibold border-b border-gray-50 block">Dashboard</a>
+    <a href="about.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">About Us</a>
+    <a href="contact.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Contact Us</a>
+    <div class="flex gap-3 pt-3">
+      <button class="flex-1 bg-green-700 text-white py-2 rounded-lg text-sm" onclick="location.href='yourtrek.html'">Organize Trek</button>
+      <button class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+<!-- Header -->
+<section class="bg-green-800 text-white px-10 py-10">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold">Organizer Dashboard</h1>
+      <p class="text-green-200 mt-1">Track your treks, bookings, and revenue in one place.</p>
+    </div>
+    <div class="hidden md:flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3">
+      <span class="text-2xl">&#128101;</span>
+      <div>
+        <p class="text-xs text-green-200">Logged in as</p>
+        <p class="font-semibold" id="dashEmail">—</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="max-w-6xl mx-auto w-full px-6 py-10 flex-grow">
+
+  <!-- Email input if not saved -->
+  <div id="emailInputRow" class="hidden bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 flex items-center gap-3">
+    <span class="text-yellow-600 text-lg">&#9888;</span>
+    <p class="text-sm text-yellow-700 flex-grow">Enter your organizer email to load your dashboard.</p>
+    <input id="dashEmailInput" type="email" placeholder="organizer@email.com" class="border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none focus:border-green-500 w-64">
+    <button onclick="loadDashboard()" class="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition text-sm font-semibold">Load</button>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+    <div class="stat-card border-green-500">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Total Treks Listed</p>
+      <p class="text-3xl font-bold text-gray-800" id="statTreks">—</p>
+      <p class="text-xs text-green-600 mt-1">Active trek listings</p>
+    </div>
+    <div class="stat-card border-blue-500">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Total Bookings</p>
+      <p class="text-3xl font-bold text-gray-800" id="statBookings">—</p>
+      <p class="text-xs text-blue-600 mt-1">Confirmed paid bookings</p>
+    </div>
+    <div class="stat-card border-yellow-500">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Total Participants</p>
+      <p class="text-3xl font-bold text-gray-800" id="statParticipants">—</p>
+      <p class="text-xs text-yellow-600 mt-1">Across all treks</p>
+    </div>
+    <div class="stat-card border-purple-500">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Total Revenue</p>
+      <p class="text-3xl font-bold text-gray-800" id="statRevenue">—</p>
+      <p class="text-xs text-purple-600 mt-1">All confirmed payments</p>
+    </div>
+  </div>
+
+  <!-- Two column: trek list + recent bookings -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+
+    <!-- Trek-wise breakdown -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:col-span-1">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">&#127956; Trek Breakdown</h2>
+      <div id="trekBreakdown" class="space-y-3">
+        <div class="skeleton h-12 w-full"></div>
+        <div class="skeleton h-12 w-full"></div>
+        <div class="skeleton h-12 w-full"></div>
+      </div>
+    </div>
+
+    <!-- Recent bookings -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:col-span-2">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-800">&#128203; Recent Bookings</h2>
+        <button onclick="loadDashboard()" class="text-xs text-green-700 border border-green-700 px-3 py-1.5 rounded-lg hover:bg-green-50 transition">&#128260; Refresh</button>
+      </div>
+      <div id="recentBookings">
+        <div class="skeleton h-10 w-full mb-3"></div>
+        <div class="skeleton h-10 w-full mb-3"></div>
+        <div class="skeleton h-10 w-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full bookings table -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-gray-800">&#128202; All Bookings</h2>
+      <div class="flex items-center gap-3">
+        <input id="searchBooking" type="text" placeholder="Search trekker or trek..." class="border border-gray-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-green-500 w-56" oninput="filterBookings()">
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-green-50 text-green-800 text-xs uppercase tracking-wide">
+            <th class="px-4 py-3 text-left rounded-tl-lg">Trekker</th>
+            <th class="px-4 py-3 text-left">Trek</th>
+            <th class="px-4 py-3 text-left">Date</th>
+            <th class="px-4 py-3 text-left">Participants</th>
+            <th class="px-4 py-3 text-left">Amount</th>
+            <th class="px-4 py-3 text-left">Gender</th>
+            <th class="px-4 py-3 text-left">Payment ID</th>
+            <th class="px-4 py-3 text-left rounded-tr-lg">Action</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTable" class="divide-y divide-gray-50">
+          <tr><td colspan="7" class="text-center py-8 text-gray-400">Loading bookings...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p id="noBookingsMsg" class="hidden text-center text-gray-400 py-10">No bookings found yet. Share your trek links to get more bookings!</p>
+  </div>
+
+</main>
+
+<footer class="footer bg-green-900 text-white mt-12">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+    <div><h2 class="text-xl font-bold mb-4">TrekFast</h2><p>We provide curated trekking experiences across the most beautiful trails.</p></div>
+    <div><h2 class="text-xl font-bold mb-4">Quick Links</h2><ul class="space-y-2"><li><a href="orgnizerhome.html" class="hover:underline">Home</a></li><li><a href="orgtreks.html" class="hover:underline">Trek</a></li><li><a href="yourtrek.html" class="hover:underline">Your Trek</a></li><li><a href="dashboard.html" class="hover:underline">Dashboard</a></li><li><a href="about.html" class="hover:underline">About Us</a></li><li><a href="contact.html" class="hover:underline">Contact Us</a></li></ul></div>
+    <div><h2 class="text-xl font-bold mb-4">Contact Us</h2><p>Email: info@trekfast.com</p><p>Phone: +91 9876543210</p><p>Location: Pune, Maharashtra, India</p></div>
+    <div><h2 class="text-xl font-bold mb-4">Follow Us</h2><div class="flex gap-4"><a href="#" class="hover:text-green-400">Facebook</a><a href="#" class="hover:text-green-400">Instagram</a><a href="#" class="hover:text-green-400">Twitter</a></div></div>
+  </div>
+  <div class="text-center text-gray-300 mt-6 border-t border-gray-700 pt-4 mb-20">&copy; 2026 TrekFast. All rights reserved.</div>
+</footer>
+
+<script>
+const API = "https://YOUR_VERCEL_BACKEND_URL";
+let allBookings = [], allTreks = [];
+
+function getEmail() {
+  return localStorage.getItem("organizerEmail") || document.getElementById("dashEmailInput").value.trim();
+}
+
+async function loadDashboard() {
+  const email = getEmail();
+  if (!email) { document.getElementById("emailInputRow").classList.remove("hidden"); return; }
+  document.getElementById("emailInputRow").classList.add("hidden");
+  document.getElementById("dashEmail").textContent = email;
+  localStorage.setItem("organizerEmail", email);
+
+  try {
+    const [bRes, tRes] = await Promise.all([
+      fetch(`${API}/organizerbookings`, { headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` } }),
+      fetch(`${API}/getorganizertreks/${encodeURIComponent(email)}`)
+    ]);
+    allBookings = await bRes.json();
+    allTreks    = await tRes.json();
+    renderStats();
+    renderTrekBreakdown();
+    renderBookingsTable(allBookings);
+    renderRecentBookings();
+  } catch(e) {
+    console.error(e);
+    document.getElementById("bookingsTable").innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-400">Error loading data. Check server connection.</td></tr>`;
+  }
+}
+
+function renderStats() {
+  const totalPax = allBookings.reduce((s,b)=>s+b.participants,0);
+  const totalRev = allBookings.reduce((s,b)=>s+b.amountPaid,0);
+  document.getElementById("statTreks").textContent       = allTreks.length;
+  document.getElementById("statBookings").textContent    = allBookings.length;
+  document.getElementById("statParticipants").textContent= totalPax;
+  document.getElementById("statRevenue").innerHTML = "&#8377;" + totalRev.toLocaleString("en-IN");
+}
+
+function renderTrekBreakdown() {
+  const bd = document.getElementById("trekBreakdown");
+  if (!allTreks.length) { bd.innerHTML=`<p class="text-gray-400 text-sm text-center py-4">No treks listed yet.</p>`; return; }
+  const bmap = {};
+  allBookings.forEach(b=>{ bmap[b.trekName]=(bmap[b.trekName]||0)+b.amountPaid; });
+  bd.innerHTML = allTreks.map(t=>`
+    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+      <div>
+        <p class="text-sm font-semibold text-gray-800">${t.trekName}</p>
+        <p class="text-xs text-gray-500">&#8377;${t.price.toLocaleString('en-IN')}/person &bull; Max ${t.maxParticipants}</p>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-bold text-green-700">&#8377;${(bmap[t.trekName]||0).toLocaleString('en-IN')}</p>
+        <p class="text-xs text-gray-400">${allBookings.filter(b=>b.trekName===t.trekName).length} bookings</p>
+      </div>
+    </div>`).join("");
+}
+
+function renderRecentBookings() {
+  const rb = document.getElementById("recentBookings");
+  const recent = [...allBookings].slice(0,5);
+  if (!recent.length) { rb.innerHTML=`<p class="text-gray-400 text-sm text-center py-4">No bookings yet.</p>`; return; }
+  rb.innerHTML = recent.map(b=>`
+    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition mb-1">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm">${b.trekkerName.charAt(0).toUpperCase()}</div>
+        <div>
+          <p class="text-sm font-semibold text-gray-800">${b.trekkerName}</p>
+          <p class="text-xs text-gray-500">${b.trekName} &bull; ${b.participants} pax</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-bold text-green-700">&#8377;${b.amountPaid.toLocaleString('en-IN')}</p>
+        <p class="text-xs text-gray-400">${new Date(b.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</p>
+      </div>
+    </div>`).join("");
+}
+
+function renderBookingsTable(bookings) {
+  const tbody = document.getElementById("bookingsTable");
+  const noMsg = document.getElementById("noBookingsMsg");
+  if (!bookings.length) {
+    tbody.innerHTML="";
+    noMsg.classList.remove("hidden");
+    return;
+  }
+  noMsg.classList.add("hidden");
+  tbody.innerHTML = bookings.map((b,i)=>{
+    const isCancelled = b.status === "cancelled";
+    const cancelCell = isCancelled
+      ? `<span class="inline-block bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full">Cancelled</span>`
+      : `<button onclick="cancelBookingOrg('${b._id}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-100 transition font-semibold">✕ Cancel</button>`;
+    return `
+    <tr class="hover:bg-gray-50 transition ${i%2===0?'':'bg-gray-50/30'} ${isCancelled?'opacity-60':''}">
+      <td class="px-4 py-3">
+        <p class="font-semibold text-gray-800">${b.trekkerName}</p>
+        <p class="text-xs text-gray-500">${b.trekkerEmail}</p>
+        <p class="text-xs text-gray-400">${b.trekkerPhone}</p>
+      </td>
+      <td class="px-4 py-3"><p class="font-medium text-gray-700">${b.trekName}</p><p class="text-xs text-gray-400">${b.trekDate||""}</p></td>
+      <td class="px-4 py-3 text-xs text-gray-600">${new Date(b.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td class="px-4 py-3"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-semibold">${b.participants} pax</span></td>
+      <td class="px-4 py-3 font-bold text-green-700">&#8377;${b.amountPaid.toLocaleString('en-IN')}</td>
+      <td class="px-4 py-3 text-xs text-gray-600">${b.gender||"—"}</td>
+      <td class="px-4 py-3"><span class="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${b.razorpayPaymentId?b.razorpayPaymentId.slice(-10)+"...":"—"}</span></td>
+      <td class="px-4 py-3">${cancelCell}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function cancelBookingOrg(bookingId) {
+  if (!confirm("Are you sure you want to cancel this booking? The trekker will be notified for refund.")) return;
+  try {
+    const res = await fetch(`${API}/cancelbooking/${bookingId}`, {
+      method: "PATCH",
+      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert("Booking cancelled successfully. Our team will contact the trekker for refund.");
+      loadDashboard();
+    } else {
+      alert(data.message || "Failed to cancel booking.");
+    }
+  } catch(e) {
+    alert("Server error. Please try again.");
+  }
+}
+
+function filterBookings() {
+  const q = document.getElementById("searchBooking").value.toLowerCase();
+  const filtered = allBookings.filter(b =>
+    b.trekkerName.toLowerCase().includes(q) ||
+    b.trekName.toLowerCase().includes(q) ||
+    (b.trekkerEmail||"").toLowerCase().includes(q)
+  );
+  renderBookingsTable(filtered);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("organizerEmail");
+  if (saved) { document.getElementById("dashEmail").textContent=saved; loadDashboard(); }
+  else { document.getElementById("emailInputRow").classList.remove("hidden"); }
+});
+</script>
+
+  <script>
+    function toggleMenu(){ const m=document.getElementById("mobileMenu"); m.style.display=m.style.display==="flex"?"none":"flex"; m.style.flexDirection="column"; }
+    function doLogout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

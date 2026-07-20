@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Spinner Animation -->
+  <style>
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+  <!-- Loader Script -->
+  <script src="../JS/loader.js"></script>
+  <!-- Login Script -->
+  <script src="../JS/login.js" defer></script>
+
+</head>
+
+<body class="min-h-screen flex items-center justify-center relative overflow-hidden">
+
+  <!-- Background Video -->
+  <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+    <source src="../Aseets/login.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Login Form -->
+  <form id="loginForm" class="relative bg-white/10 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm mx-4 md:mx-0">
+
+    <h2 class="text-2xl font-bold mb-6 text-green-900 text-center">
+      Login
+    </h2>
+
+    <!-- User Type -->
+    <div class="mb-4 flex justify-center gap-6">
+      <label>
+        <input type="radio" name="userType" id="trekker" value="trekker" checked />
+        Trekker
+      </label>
+      <label>
+        <input type="radio" name="userType" id="organizer" value="organizer" />
+        Organizer
+      </label>
+    </div>
+
+    <!-- Email -->
+    <input id="email" type="email" placeholder="Email" required class="w-full mb-3 p-2 border rounded" />
+
+    <!-- Password -->
+    <input id="password" type="password" placeholder="Password" required class="w-full mb-3 p-2 border rounded" />
+
+    <!-- Forgot Password -->
+    <div class="text-right mb-3">
+      <a href="forgotpassword.html" class="text-sm text-white hover:text-blue-300 underline transition">
+        Forgot Password?
+      </a>
+    </div>
+
+    <!-- Robot Check -->
+    <label class="flex items-center text-white mb-4">
+      <input type="checkbox" id="robot" class="mr-2" />
+      I am not a robot
+    </label>
+
+    <!-- Buttons -->
+    <div class="flex gap-3">
+
+      <!-- Login Button -->
+      <button type="submit" id="loginBtn"
+        class="w-1/2 bg-blue-600 text-white py-2 rounded-3xl hidden disabled:opacity-60 disabled:cursor-not-allowed">
+        Login
+      </button>
+
+      <!-- Register -->
+      <a href="register.html" class="w-1/2 bg-green-600 text-white py-2 rounded-3xl text-center">
+        Register
+      </a>
+
+    </div>
+
+  </form>
+
+</body>
+
+</html>

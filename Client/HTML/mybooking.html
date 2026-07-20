@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - TrekFast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+    nav ul li { position: relative; cursor: pointer; }
+    nav ul li::after {
+      content: ""; position: absolute; left: 0; bottom: -6px;
+      width: 0; height: 2px; background-color: #16a34a;
+      border-radius: 999px; transition: width 0.35s ease;
+    }
+    nav ul li:hover::after { width: 100%; }
+    .footer a:hover { color: #16a34a; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2.5px solid rgba(22,163,74,0.2);
+      border-top-color: #16a34a; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .booking-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .booking-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+    /* Hamburger menu */
+    #mobileMenu { display: none; }
+    #mobileMenu.open { display: flex; }
+
+    /* Status badges */
+    .badge-active   { background:#dcfce7; color:#15803d; }
+    .badge-pending  { background:#fef9c3; color:#a16207; }
+    .badge-failed   { background:#fee2e2; color:#b91c1c; }
+    .badge-expired  { background:#f3f4f6; color:#6b7280; }
+    .badge-cancelled { background:#fee2e2; color:#b91c1c; }
+  </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="flex items-center justify-between px-6 md:px-10 py-5 shadow-md bg-white sticky top-0 z-40">
+    <div class="text-2xl font-bold text-green-800 cursor-pointer" onclick="location.href='home.html'">TrekFast</div>
+
+    <!-- Desktop Nav -->
+    <ul class="hidden md:flex items-center gap-8 lg:gap-10 text-gray-600 font-medium">
+      <li onclick="location.href='home.html'">Home</li>
+      <li onclick="location.href='trek.html'">Trek</li>
+      <li onclick="location.href='mybooking.html'" class="text-green-700 font-semibold">My Booking</li>
+      <li onclick="location.href='about.html'">About Us</li>
+      <li onclick="location.href='contact.html'">Contact Us</li>
+    </ul>
+    <div class="hidden md:flex gap-3">
+      <button class="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition text-sm" onclick="location.href='trek.html'">Get Ticket</button>
+      <button class="bg-gray-200 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm" onclick="doLogout()">Logout</button>
+    </div>
+
+    <!-- Hamburger -->
+    <button id="hamburger" class="md:hidden flex flex-col gap-1.5 p-2" onclick="toggleMenu()">
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="md:hidden flex-col bg-white border-b border-gray-100 shadow-sm px-6 pb-5 gap-3 z-30">
+    <a href="home.html" class="py-2 text-gray-700 font-medium border-b border-gray-50 block">Home</a>
+    <a href="trek.html" class="py-2 text-gray-700 font-medium border-b border-gray-50 block">Trek</a>
+    <a href="mybooking.html" class="py-2 text-green-700 font-semibold border-b border-gray-50 block">My Booking</a>
+    <a href="about.html" class="py-2 text-gray-700 font-medium border-b border-gray-50 block">About Us</a>
+    <a href="contact.html" class="py-2 text-gray-700 font-medium border-b border-gray-50 block">Contact Us</a>
+    <div class="flex gap-3 pt-2">
+      <button class="flex-1 bg-green-700 text-white py-2 rounded-lg text-sm" onclick="location.href='trek.html'">Get Ticket</button>
+      <button class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="bg-gradient-to-r from-green-800 to-green-600 text-white px-6 md:px-10 py-10 md:py-14">
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">My Bookings</h1>
+      <p class="text-green-100 text-sm md:text-base">Track all your trek adventures in one place</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-5xl mx-auto w-full px-4 md:px-6 py-8 md:py-12">
+
+
+    <!-- Payment Success Banner -->
+    <div id="successBanner" class="hidden bg-green-50 border border-green-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+      <div class="text-3xl">🎉</div>
+      <div>
+        <h3 class="font-bold text-green-800 text-base">Booking Confirmed!</h3>
+        <p class="text-sm text-green-700 mt-0.5" id="successMsg">Your trek has been booked successfully.</p>
+      </div>
+      <button onclick="document.getElementById('successBanner').classList.add('hidden')" class="ml-auto text-green-500 hover:text-green-700 text-xl leading-none">&times;</button>
+    </div>
+
+    <!-- Not Logged In -->
+    <div id="notLoggedIn" class="hidden text-center py-20">
+      <div class="text-5xl mb-4">🔒</div>
+      <h2 class="text-xl font-bold text-gray-700 mb-2">Please log in to view your bookings</h2>
+      <p class="text-gray-500 mb-6 text-sm">Your booking history will appear here after you log in.</p>
+      <a href="login.html" class="bg-green-700 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 transition inline-block">Login Now</a>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingState" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="spinner" style="width:36px;height:36px;border-width:3px;"></div>
+      <p class="text-gray-500 text-sm">Loading your bookings...</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div id="statsRow" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-green-700" id="statTotal">0</p>
+        <p class="text-xs text-gray-500 mt-1">Total Bookings</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-blue-600" id="statActive">0</p>
+        <p class="text-xs text-gray-500 mt-1">Active Treks</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-500" id="statCompleted">0</p>
+        <p class="text-xs text-gray-500 mt-1">Completed</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
+        <p class="text-2xl font-bold text-green-600" id="statSpent">₹0</p>
+        <p class="text-xs text-gray-500 mt-1">Total Spent</p>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div id="filterRow" class="hidden flex gap-2 mb-6 flex-wrap">
+      <button class="filter-tab active px-4 py-2 rounded-full text-sm font-medium bg-green-700 text-white border border-green-700 transition" data-filter="all" onclick="filterBookings('all', this)">All</button>
+      <button class="filter-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:border-green-600 hover:text-green-700 transition" data-filter="active" onclick="filterBookings('active', this)">Active</button>
+      <button class="filter-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:border-green-600 hover:text-green-700 transition" data-filter="completed" onclick="filterBookings('completed', this)">Completed</button>
+      <button class="filter-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:border-green-600 hover:text-green-700 transition" data-filter="pending" onclick="filterBookings('pending', this)">Pending</button>
+      <button class="filter-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:border-green-600 hover:text-green-700 transition" data-filter="failed" onclick="filterBookings('failed', this)">Failed</button>
+      <button class="filter-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:border-red-500 hover:text-red-600 transition" data-filter="cancelled" onclick="filterBookings('cancelled', this)">Cancelled</button>
+    </div>
+
+    <!-- Bookings Grid -->
+    <div id="bookingsList" class="hidden space-y-4"></div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-20">
+      <div class="text-5xl mb-4">🌄</div>
+      <h2 class="text-xl font-bold text-gray-700 mb-2">No bookings yet!</h2>
+      <p class="text-gray-400 text-sm mb-6">Explore amazing treks and book your first adventure.</p>
+      <a href="trek.html" class="bg-green-700 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 transition inline-block">Explore Treks</a>
+    </div>
+
+    <!-- Empty Filter State -->
+    <div id="emptyFilter" class="hidden text-center py-16">
+      <div class="text-4xl mb-3">🔍</div>
+      <p class="text-gray-500 text-sm">No bookings match this filter.</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden text-center py-20">
+      <div class="text-4xl mb-4">⚠️</div>
+      <h2 class="text-lg font-bold text-gray-700 mb-2">Could not load bookings</h2>
+      <p class="text-red-500 text-sm mb-4" id="errorMsg"></p>
+      <button onclick="loadBookings()" class="bg-green-700 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-green-600 transition">Try Again</button>
+    </div>
+
+  </main>
+
+  <!-- Cancellation Success Full-Page Overlay -->
+  <div id="cancelSuccessOverlay" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 p-10 text-center">
+      <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="text-4xl">❌</span>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-3" style="font-family:'Playfair Display',serif;">Booking Cancelled Successfully</h2>
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+        <p class="text-amber-800 text-sm font-medium">📞 Our team will contact you soon for refund processing.</p>
+      </div>
+      <p class="text-gray-500 text-sm mb-8">We're sorry to see your trek cancelled. If you have any questions, please reach out to us at <span class="font-semibold text-green-700">info@trekfast.com</span></p>
+      <div class="flex flex-col gap-3">
+        <button onclick="closeCancelSuccess()" class="bg-green-700 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 transition">View My Bookings</button>
+        <a href="trek.html" class="text-green-700 border border-green-700 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition block">Explore Other Treks</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer bg-green-900 text-white mt-12">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div>
+        <h2 class="text-xl font-bold mb-4">TrekFast</h2>
+        <p class="text-sm text-green-200">We provide curated trekking experiences across the most beautiful trails. Adventure, nature, and safety — all in one journey.</p>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold mb-4">Quick Links</h2>
+        <ul class="space-y-2 text-sm">
+          <li><a href="home.html" class="hover:underline text-green-200">Home</a></li>
+          <li><a href="trek.html" class="hover:underline text-green-200">Trek</a></li>
+          <li><a href="about.html" class="hover:underline text-green-200">About Us</a></li>
+          <li><a href="contact.html" class="hover:underline text-green-200">Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold mb-4">Contact Us</h2>
+        <p class="text-sm text-green-200">Email: info@trekfast.com</p>
+        <p class="text-sm text-green-200">Phone: +91 9876543210</p>
+        <p class="text-sm text-green-200">Location: Pune, Maharashtra, India</p>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold mb-4">Follow Us</h2>
+        <div class="flex gap-4 text-sm">
+          <a href="#" class="hover:text-green-400 text-green-200">Facebook</a>
+          <a href="#" class="hover:text-green-400 text-green-200">Instagram</a>
+          <a href="#" class="hover:text-green-400 text-green-200">Twitter</a>
+        </div>
+      </div>
+    </div>
+    <div class="text-center text-gray-300 text-sm border-t border-gray-700 pt-4 pb-6">
+      &copy; 2026 TrekFast. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    const API = "https://YOUR_VERCEL_BACKEND_URL";
+    const DEF_IMG = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=60";
+    let allBookings = [];
+
+    function toggleMenu() {
+      document.getElementById("mobileMenu").classList.toggle("open");
+    }
+
+    function doLogout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    function show(id)   { document.getElementById(id).classList.remove("hidden"); }
+    function hide(id)   { document.getElementById(id).classList.add("hidden"); }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        hide("loadingState");
+        show("notLoggedIn");
+        return;
+      }
+      loadBookings();
+    });
+
+    async function loadBookings() {
+      // Reset
+      ["notLoggedIn","bookingsList","emptyState","emptyFilter","errorState","statsRow","filterRow"].forEach(hide);
+      show("loadingState");
+
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API}/mybookings`, {
+          headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
+        });
+
+        hide("loadingState");
+
+        if (res.status === 401) { show("notLoggedIn"); return; }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Server error");
+
+        allBookings = Array.isArray(data) ? data : [];
+
+        if (allBookings.length === 0) { show("emptyState"); return; }
+
+        // Stats
+        const now = new Date();
+        let active = 0, completed = 0, spent = 0;
+        allBookings.forEach(b => {
+          const end = b.trekEndDate ? new Date(b.trekEndDate) : b.trekDate ? new Date(b.trekDate) : null;
+          const expired = end ? end < now : false;
+          if (b.status !== "failed" && b.status !== "pending") {
+            if (!expired) active++;
+            else completed++;
+          }
+          if (b.amountPaid) spent += Number(b.amountPaid);
+        });
+
+        document.getElementById("statTotal").textContent     = allBookings.length;
+        document.getElementById("statActive").textContent    = active;
+        document.getElementById("statCompleted").textContent = completed;
+        document.getElementById("statSpent").textContent     = "₹" + spent.toLocaleString("en-IN");
+
+        show("statsRow");
+        show("filterRow");
+        renderBookings(allBookings);
+
+      } catch (e) {
+        hide("loadingState");
+        show("errorState");
+        document.getElementById("errorMsg").textContent = e.message || "Could not load bookings.";
+      }
+    }
+
+    function filterBookings(type, btn) {
+      document.querySelectorAll(".filter-tab").forEach(t => {
+        t.className = "filter-tab px-4 py-2 rounded-full text-sm font-medium text-gray-600 border border-gray-300 bg-white hover:border-green-600 hover:text-green-700 transition";
+      });
+      btn.className = "filter-tab active px-4 py-2 rounded-full text-sm font-medium bg-green-700 text-white border border-green-700 transition";
+
+      const now = new Date();
+      let filtered = allBookings;
+
+      if (type === "active") {
+        filtered = allBookings.filter(b => {
+          const end = b.trekEndDate ? new Date(b.trekEndDate) : b.trekDate ? new Date(b.trekDate) : null;
+          return b.status !== "failed" && b.status !== "pending" && (!end || end >= now);
+        });
+      } else if (type === "completed") {
+        filtered = allBookings.filter(b => {
+          const end = b.trekEndDate ? new Date(b.trekEndDate) : b.trekDate ? new Date(b.trekDate) : null;
+          return b.status !== "failed" && b.status !== "pending" && end && end < now;
+        });
+      } else if (type === "pending") {
+        filtered = allBookings.filter(b => b.status === "pending");
+      } else if (type === "failed") {
+        filtered = allBookings.filter(b => b.status === "failed");
+      } else if (type === "cancelled") {
+        filtered = allBookings.filter(b => b.status === "cancelled");
+      }
+
+      if (filtered.length === 0) {
+        hide("bookingsList");
+        show("emptyFilter");
+      } else {
+        hide("emptyFilter");
+        renderBookings(filtered);
+      }
+    }
+
+    function renderBookings(bookings) {
+      const list = document.getElementById("bookingsList");
+      const now = new Date();
+
+      list.innerHTML = bookings.map(b => {
+        const end = b.trekEndDate ? new Date(b.trekEndDate) : b.trekDate ? new Date(b.trekDate) : null;
+        const expired  = end ? end < now : false;
+        const isFailed    = b.status === "failed";
+        const isPending   = b.status === "pending";
+        const isCancelled = b.status === "cancelled";
+
+        let badgeCls, badgeTxt, badgeIcon;
+        if (isCancelled)    { badgeCls = "badge-cancelled"; badgeTxt = "Cancelled";       badgeIcon = "✕"; }
+        else if (isFailed)  { badgeCls = "badge-failed";    badgeTxt = "Payment Failed";  badgeIcon = "✗"; }
+        else if (isPending) { badgeCls = "badge-pending";   badgeTxt = "Pending";         badgeIcon = "⏳"; }
+        else if (expired)   { badgeCls = "badge-expired";   badgeTxt = "Completed";       badgeIcon = "✓"; }
+        else                { badgeCls = "badge-active";    badgeTxt = "Active";          badgeIcon = "✅"; }
+
+        const bookedOn = new Date(b.createdAt).toLocaleDateString("en-IN", {
+          day: "numeric", month: "short", year: "numeric"
+        });
+        const trekDateFmt = b.trekDate
+          ? new Date(b.trekDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+          : "Date TBD";
+
+        const imgFilter = (expired && !isFailed) ? "grayscale opacity-70" : "";
+
+        // Show cancel button only for active/paid bookings that haven't expired
+        const canCancel = !isCancelled && !isFailed && !expired;
+        const cancelBtn = canCancel
+          ? `<button onclick="cancelMyBooking('${b._id}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-4 py-1.5 rounded-lg hover:bg-red-100 transition font-semibold">✕ Cancel Booking</button>`
+          : "";
+
+        return `
+          <div class="booking-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col sm:flex-row ${isCancelled ? 'opacity-70' : ''}">
+            <!-- Trek Image -->
+            <div class="sm:w-48 md:w-56 flex-shrink-0">
+              <img src="${b.trekImage || DEF_IMG}" alt="${b.trekName}"
+                class="w-full h-48 sm:h-full object-cover ${imgFilter}"
+                onerror="this.src='${DEF_IMG}'">
+            </div>
+
+            <!-- Details -->
+            <div class="flex-1 p-5 flex flex-col justify-between gap-3">
+              <div class="flex items-start justify-between gap-2 flex-wrap">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-800">${b.trekName || "Trek"}</h3>
+                  ${b.trekLocation ? `<p class="text-sm text-gray-400 mt-0.5">📍 ${b.trekLocation}</p>` : ""}
+                </div>
+                <span class="text-xs font-semibold px-3 py-1 rounded-full ${badgeCls} flex-shrink-0">
+                  ${badgeIcon} ${badgeTxt}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                <div class="bg-gray-50 rounded-xl p-3">
+                  <p class="text-xs text-gray-400 font-medium">Trek Date</p>
+                  <p class="font-semibold text-gray-700 mt-0.5">📅 ${trekDateFmt}</p>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-3">
+                  <p class="text-xs text-gray-400 font-medium">Participants</p>
+                  <p class="font-semibold text-gray-700 mt-0.5">👥 ${b.participants || 1} person${(b.participants||1) > 1 ? "s" : ""}</p>
+                </div>
+                <div class="bg-green-50 rounded-xl p-3 col-span-2 sm:col-span-1">
+                  <p class="text-xs text-gray-400 font-medium">Amount Paid</p>
+                  <p class="font-bold text-green-700 mt-0.5 text-base">₹${(b.amountPaid || 0).toLocaleString("en-IN")}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs text-gray-400 pt-1 border-t border-gray-50 flex-wrap gap-2">
+                <span>Booking ID: <span class="font-mono text-gray-500">${b._id ? b._id.slice(-8).toUpperCase() : "N/A"}</span></span>
+                <div class="flex items-center gap-3">
+                  <span>Booked on ${bookedOn}</span>
+                  ${cancelBtn}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      show("bookingsList");
+    }
+
+    async function cancelMyBooking(bookingId) {
+      if (!confirm("Are you sure you want to cancel this booking? Our team will contact you for refund.")) return;
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API}/cancelbooking/${bookingId}`, {
+          method: "PATCH",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showCancelSuccess();
+          await loadBookings();
+        } else {
+          alert(data.message || "Failed to cancel booking.");
+        }
+      } catch(e) {
+        alert("Server error. Please try again.");
+      }
+    }
+
+    function showCancelSuccess() {
+      const overlay = document.getElementById("cancelSuccessOverlay");
+      overlay.classList.remove("hidden");
+      overlay.classList.add("flex");
+    }
+
+    function closeCancelSuccess() {
+      const overlay = document.getElementById("cancelSuccessOverlay");
+      overlay.classList.add("hidden");
+      overlay.classList.remove("flex");
+    }
+  </script>
+</body>
+</html>

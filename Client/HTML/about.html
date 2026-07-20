@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - TrekFast</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        h1,
+        h2 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Soft animated underline */
+        nav ul li {
+            position: relative;
+            cursor: pointer;
+        }
+
+        nav ul li::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 0;
+            height: 3px;
+            background-color: #16a34a;
+            border-radius: 999px;
+            transition: width 0.35s ease;
+        }
+
+        nav ul li:hover::after {
+            width: 100%;
+        }
+
+        .footer a:hover {
+            color: #16a34a;
+        }
+    </style>
+</head>
+
+<body class="bg-white flex flex-col min-h-screen">
+
+  <!-- USER NAV -->
+  <nav id="userNav" class="hidden items-center justify-between px-6 md:px-10 py-5 shadow-md bg-white sticky top-0 z-40">
+    <div class="text-2xl font-bold text-green-800 cursor-pointer" onclick="location.href='home.html'">TrekFast</div>
+    <ul class="hidden md:flex items-center gap-8 lg:gap-10 text-gray-600 font-medium">
+      <li onclick="location.href='home.html'">Home</li>
+      <li onclick="location.href='trek.html'">Trek</li>
+      <li onclick="location.href='mybooking.html'">My Booking</li>
+      <li class="text-green-700 font-semibold">About Us</li>
+      <li onclick="location.href='contact.html'">Contact Us</li>
+    </ul>
+    <div class="hidden md:flex gap-3">
+      <button class="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition text-sm" onclick="location.href='trek.html'">Get Ticket</button>
+      <button class="bg-gray-200 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm" onclick="doLogout()">Logout</button>
+    </div>
+    <button class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('userMobileMenu').classList.toggle('open')">
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+    </button>
+  </nav>
+  <div id="userMobileMenu" style="display:none" class="md:hidden flex-col bg-white border-b border-gray-100 shadow-sm px-6 pb-4 gap-1 z-30">
+    <a href="home.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Home</a>
+    <a href="trek.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Trek</a>
+    <a href="mybooking.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">My Booking</a>
+    <a href="about.html" class="py-2.5 text-green-700 font-semibold border-b border-gray-50 block">About Us</a>
+    <a href="contact.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Contact Us</a>
+    <div class="flex gap-3 pt-3">
+      <button class="flex-1 bg-green-700 text-white py-2 rounded-lg text-sm" onclick="location.href='trek.html'">Get Ticket</button>
+      <button class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <!-- ORGANIZER NAV -->
+  <nav id="orgNav" class="hidden items-center justify-between px-6 md:px-10 py-5 shadow-md bg-white sticky top-0 z-40">
+    <div class="text-2xl font-bold text-green-800 cursor-pointer" onclick="location.href='orgnizerhome.html'">TrekFast</div>
+    <ul class="hidden md:flex items-center gap-8 lg:gap-10 text-gray-600 font-medium">
+      <li onclick="location.href='orgnizerhome.html'">Home</li>
+      <li onclick="location.href='orgtreks.html'">Trek</li>
+      <li onclick="location.href='yourtrek.html'">Your Trek</li>
+      <li onclick="location.href='dashboard.html'">Dashboard</li>
+      <li class="text-green-700 font-semibold">About Us</li>
+      <li onclick="location.href='contact.html'">Contact Us</li>
+    </ul>
+    <div class="hidden md:flex gap-3">
+      <button class="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition text-sm" onclick="location.href='yourtrek.html'">Organize Trek</button>
+      <button class="bg-gray-200 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm" onclick="doLogout()">Logout</button>
+    </div>
+    <button class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('orgMobileMenu').classList.toggle('open')">
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+    </button>
+  </nav>
+  <div id="orgMobileMenu" style="display:none" class="md:hidden flex-col bg-white border-b border-gray-100 shadow-sm px-6 pb-4 gap-1 z-30">
+    <a href="orgnizerhome.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Home</a>
+    <a href="orgtreks.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Trek</a>
+    <a href="yourtrek.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Your Trek</a>
+    <a href="dashboard.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Dashboard</a>
+    <a href="about.html" class="py-2.5 text-green-700 font-semibold border-b border-gray-50 block">About Us</a>
+    <a href="contact.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Contact Us</a>
+    <div class="flex gap-3 pt-3">
+      <button class="flex-1 bg-green-700 text-white py-2 rounded-lg text-sm" onclick="location.href='yourtrek.html'">Organize Trek</button>
+      <button class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+    <!-- Hero -->
+    <section class="text-center px-6 py-16 bg-green-50">
+        <h1 class="text-3xl md:text-5xl font-bold text-green-800">About TrekFast</h1>
+
+        <p class="mt-6 max-w-3xl mx-auto text-lg text-gray-700">
+            TrekFast helps adventure lovers discover, plan, and book unforgettable trekking experiences.
+            From peaceful nature walks to challenging mountain trails, we make every journey safe,
+            simple, and exciting.
+        </p>
+    </section>
+
+    <!-- Our Story -->
+    <section class="max-w-6xl mx-auto px-8 py-16 grid md:grid-cols-2 gap-12 items-center">
+
+        <!-- TALL IMAGE -->
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"
+            alt="Mountain Trek" class="rounded-xl shadow-lg w-full h-64 md:h-[480px] object-cover">
+
+        <div>
+            <h2 class="text-3xl font-bold text-green-800">Our Journey</h2>
+
+            <p class="mt-6 text-gray-700 text-lg">
+                TrekFast officially launched on <strong>1 January 2026</strong> with a vision to
+                make trekking accessible to everyone — beginners, families, solo travelers,
+                and adventure enthusiasts.
+            </p>
+
+            <p class="mt-4 text-gray-700">
+                We noticed that planning a trek was often confusing, time-consuming, and risky.
+                So we built a platform where users can easily explore verified treks,
+                compare options, and book with confidence.
+            </p>
+
+            <p class="mt-4 text-gray-700">
+                Today, TrekFast is growing into a trusted hub for outdoor adventures across India,
+                helping thousands reconnect with nature.
+            </p>
+        </div>
+    </section>
+
+    <!-- What We Offer -->
+    <section class="bg-green-50 py-16 px-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-3xl font-bold text-green-800">What We Offer</h2>
+
+            <p class="mt-6 text-gray-700 max-w-3xl mx-auto">
+                We handle everything — from discovery to booking — so you can focus on enjoying
+                the experience.
+            </p>
+
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10">
+
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-green-700">Easy Online Booking</h3>
+                    <p class="mt-3 text-gray-600">
+                        Reserve your trek in minutes with our simple and secure system.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-green-700">Verified Trails</h3>
+                    <p class="mt-3 text-gray-600">
+                        All treks are carefully reviewed for safety and quality.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-green-700">Expert Guidance</h3>
+                    <p class="mt-3 text-gray-600">
+                        Get tips, preparation guides, and support from experienced trekkers.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="max-w-6xl mx-auto px-8 py-16 text-center">
+
+        <h2 class="text-3xl font-bold text-green-800 mb-12">
+            Our Impact So Far
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+            <div class="bg-green-50 p-8 rounded-xl shadow">
+                <h3 class="text-4xl font-bold text-green-700">12,000+</h3>
+                <p class="text-gray-600 mt-2">Registered Users</p>
+            </div>
+
+            <div class="bg-green-50 p-8 rounded-xl shadow">
+                <h3 class="text-4xl font-bold text-green-700">2,500+</h3>
+                <p class="text-gray-600 mt-2">Treks Booked</p>
+            </div>
+
+            <div class="bg-green-50 p-8 rounded-xl shadow">
+                <h3 class="text-4xl font-bold text-green-700">120+</h3>
+                <p class="text-gray-600 mt-2">Destinations</p>
+            </div>
+
+            <div class="bg-green-50 p-8 rounded-xl shadow">
+                <h3 class="text-4xl font-bold text-green-700">98%</h3>
+                <p class="text-gray-600 mt-2">Happy Customers</p>
+            </div>
+
+        </div>
+    </section>
+    <!-- Our Team -->
+    <section class="bg-green-50 py-20 px-8">
+        <div class="max-w-6xl mx-auto text-center">
+
+            <h2 class="text-4xl font-bold text-green-800">Meet Our Team</h2>
+
+            <p class="mt-6 text-gray-700 max-w-3xl mx-auto text-lg">
+                Passionate explorers and innovators behind TrekFast, working to make
+                your adventure planning simple, safe, and unforgettable.
+            </p>
+
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10">
+
+                <!-- Member 1 -->
+                <div
+                    class="bg-white rounded-2xl shadow-lg p-8 transform transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
+
+                    <img src="../Aseets/prasad.jpg" alt="Prasad Ghadge"
+                        class="w-40 h-40 mx-auto rounded-full object-cover shadow-md border-4 border-green-100">
+
+                    <h3 class="mt-6 text-xl font-bold text-green-800">
+                        Prasad Ghadge
+                    </h3>
+
+                    <p class="text-gray-500 mt-1">Founder</p>
+
+                    <p class="text-gray-600 mt-3">
+                        prasadghadge2305@gmail.com
+                    </p>
+                </div>
+
+                <!-- Member 2 -->
+                <div
+                    class="bg-white rounded-2xl shadow-lg p-8 transform transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
+
+                    <img src="../Aseets/adityagaikwad.png" alt="Aditya Gaikwad"
+                        class="w-40 h-40 mx-auto rounded-full object-cover shadow-md border-4 border-green-100">
+
+                    <h3 class="mt-6 text-xl font-bold text-green-800">
+                        Aditya Gaikwad
+                    </h3>
+
+                    <p class="text-gray-500 mt-1">Founder</p>
+
+                    <p class="text-gray-600 mt-3">
+                        gaikwadaditya2815@gmail.com
+                    </p>
+                </div>
+
+                <!-- Member 3 -->
+                <div
+                    class="bg-white rounded-2xl shadow-lg p-8 transform transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
+
+                    <img src="../Aseets/adityaanbhule.png" alt="Aditya Anbhule"
+                        class="w-40 h-40 mx-auto rounded-full object-cover shadow-md border-4 border-green-100">
+
+                    <h3 class="mt-6 text-xl font-bold text-green-800">
+                        Aditya Anbhule
+                    </h3>
+
+                    <p class="text-gray-500 mt-1">Founder</p>
+
+                    <p class="text-gray-600 mt-3">
+                        adityaanbhule2002@gmail.com
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-green-900 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+
+            <div>
+                <h2 class="text-xl font-bold mb-4">TrekFast</h2>
+                <p>Your gateway to unforgettable trekking adventures.</p>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold mb-4">Quick Links</h2>
+                <ul class="space-y-2">
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="trek.html">Trek</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold mb-4">Contact</h2>
+                <p>Email: trekfast.in@gmail.com</p>
+                <p>Phone: +917887695914</p>x
+                <p>Pune, Maharashtra, India</p>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold mb-4">Follow Us</h2>
+                <div class="flex gap-4">
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-center text-gray-300 border-t border-gray-700 pt-4 mb-10">
+            © 2026 TrekFast. All rights reserved.
+        </div>
+    </footer>
+  <script>
+    // ── Smart Nav: show correct navbar based on login session ──────────────
+    (function() {
+      const utype = localStorage.getItem("userType");
+      const userNav = document.getElementById("userNav");
+      const orgNav  = document.getElementById("orgNav");
+      const userMM  = document.getElementById("userMobileMenu");
+      const orgMM   = document.getElementById("orgMobileMenu");
+      if (utype === "organizer") {
+        userNav.style.display = "none";
+        orgNav.style.display  = "flex";
+        if(userMM) userMM.style.display = "none";
+      } else {
+        userNav.style.display = "flex";
+        orgNav.style.display  = "none";
+        if(orgMM) orgMM.style.display = "none";
+      }
+      // Mobile menu toggles
+      [['userNav','userMobileMenu'],['orgNav','orgMobileMenu']].forEach(([navId, menuId]) => {
+        const btn = document.querySelector('#' + navId + ' button.md\\:hidden');
+        if(btn) btn.onclick = function(){ const m = document.getElementById(menuId); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; m.style.flexDirection = 'column'; };
+      });
+    })();
+    function doLogout() {
+            localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+
+</html>

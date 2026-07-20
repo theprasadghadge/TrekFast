@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../JS/userregister.js" defer></script>
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center relative overflow-hidden">
+
+  <!-- Background Video -->
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    class="absolute inset-0 w-full h-full object-cover"
+    style="filter: brightness(1.3) contrast(1.1) saturate(1.2);"
+  >
+    <source src="../Aseets/login2.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Soft Dark Overlay -->
+  <div class="absolute inset-0 bg-black/20"></div>
+
+  <!-- Register Form -->
+  <form onsubmit="handleRegister(event)"
+    class="relative bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-[520px] max-w-[90%]">
+    <h2 class="text-2xl font-bold text-center mb-6 text-green-900">Register</h2>
+
+    <!-- User Type -->
+    <div class="mb-6 flex justify-center gap-8 text-lg font-medium text-white">
+      <label>
+        <input type="radio" name="userType" id="trekker" value="trekker" checked />
+        Trekker
+      </label>
+      <label>
+        <input type="radio" name="userType" id="organizer" value="organizer" onclick="goToOrganizer()" />
+        Organizer
+      </label>
+    </div>
+
+    <!-- Name -->
+    <div class="grid grid-cols-3 gap-2 mb-4">
+      <input type="text" id="firstName" placeholder="First Name"
+        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+      <input type="text" id="middleName" placeholder="Middle Name"
+        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" />
+      <input type="text" id="lastName" placeholder="Last Name"
+        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+    </div>
+
+    <!-- Mobile -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-white">Mobile Number</label>
+      <input type="tel" id="mobile" placeholder="Enter Mobile Number"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+    </div>
+
+    <!-- Email + OTP Button -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-white">Email</label>
+      <div class="flex gap-2">
+        <input type="email" id="email" placeholder="Enter Email"
+          class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+
+        <!-- OTP Button with Spinner -->
+        <button
+          type="button"
+          id="otpBtn"
+          onclick="sendOTPWithSpinner()"
+          class="min-w-[90px] flex items-center justify-center gap-2 bg-blue-500 text-white px-4 rounded-lg hover:bg-blue-600 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <span id="otpBtnText">Get OTP</span>
+          <span id="otpSpinner" class="spinner hidden"></span>
+        </button>
+      </div>
+
+      <!-- Status message below email -->
+      <p id="otpStatus" class="mt-1 text-sm hidden"></p>
+    </div>
+
+    <!-- OTP Input -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-white">Enter OTP</label>
+      <input type="text" id="otp" placeholder="Enter OTP"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+    </div>
+
+    <!-- Password -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-white">Password</label>
+      <input id="pass" type="password" placeholder="Enter password"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="mb-4">
+      <label class="block mb-1 font-medium text-white">Confirm Password</label>
+      <input id="cpass" type="password" placeholder="Confirm password"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400" required />
+    </div>
+
+    <!-- Submit -->
+    <button type="submit"
+      class="w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-900 transition font-semibold">
+      Register
+    </button>
+  </form>
+</body>
+</html>

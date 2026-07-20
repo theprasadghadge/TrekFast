@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Trek - TrekFast Organizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Roboto', sans-serif; }
+    h1,h2,h3 { font-family: 'Playfair Display', serif; }
+    nav ul li { position: relative; cursor: pointer; }
+    nav ul li::after { content:""; position:absolute; left:0; bottom:-6px; width:0; height:2px; background-color:#16a34a; border-radius:999px; transition:width 0.35s ease; }
+    nav ul li:hover::after { width:100%; }
+    .footer a:hover { color:#16a34a; }
+    .fs { background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:24px; margin-bottom:20px; }
+    .fi { width:100%; padding:10px 14px; border:1px solid #d1d5db; border-radius:8px; font-size:0.9rem; outline:none; transition:border-color 0.2s; background:white; }
+    .fi:focus { border-color:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,0.12); }
+    .fl { display:block; font-size:0.8rem; font-weight:600; color:#374151; margin-bottom:4px; }
+    .trek-card { background:white; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); overflow:hidden; transition:transform 0.2s,box-shadow 0.2s; }
+    .trek-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,0.13); }
+    .diff-badge { padding:3px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+  </style>
+</head>
+<body class="bg-white flex flex-col min-h-screen">
+
+<nav class="flex items-center justify-between px-6 md:px-10 py-5 shadow-md bg-white sticky top-0 z-40">
+  <div class="text-2xl font-bold text-green-800 cursor-pointer" onclick="location.href='orgnizerhome.html'">TrekFast</div>
+  <ul class="hidden md:flex items-center gap-8 lg:gap-10 text-gray-600 font-medium">
+    <li onclick="location.href='orgnizerhome.html'">Home</li>
+    <li onclick="location.href='orgtreks.html'">Trek</li>
+    <li class="text-green-700 font-semibold">Your Trek</li>
+    <li onclick="location.href='dashboard.html'">Dashboard</li>
+    <li onclick="location.href='about.html'">About Us</li>
+    <li onclick="location.href='contact.html'">Contact Us</li>
+  </ul>
+  <div class="flex gap-4">
+    <button class="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition" onclick="scrollToForm()">+ Add Trek</button>
+    <button class="bg-gray-200 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-300 transition text-sm" onclick="doLogout()">Logout</button>
+  </div>
+    <button class="md:hidden flex flex-col gap-1.5 p-2" onclick="toggleMenu()">
+      <span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span><span class="w-6 h-0.5 bg-gray-700 rounded"></span>
+    </button>
+  </nav>
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" style="display:none" class="md:hidden flex-col bg-white border-b border-gray-100 shadow-sm px-6 pb-4 gap-1 z-30">
+    <a href="orgnizerhome.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Home</a>
+    <a href="orgtreks.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Treks</a>
+    <a href="yourtrek.html" class="py-2.5 text-green-700 font-semibold border-b border-gray-50 block">Your Trek</a>
+    <a href="dashboard.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Dashboard</a>
+    <a href="about.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">About Us</a>
+    <a href="contact.html" class="py-2.5 text-gray-700 border-b border-gray-50 block">Contact Us</a>
+    <div class="flex gap-3 pt-3">
+      <button class="flex-1 bg-green-700 text-white py-2 rounded-lg text-sm" onclick="location.href='yourtrek.html'">Organize Trek</button>
+      <button class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+<section class="bg-green-50 px-10 py-12 text-center">
+  <h1 class="text-4xl md:text-5xl font-bold text-green-800">Manage Your Treks</h1>
+  <p class="mt-4 text-gray-600 text-lg max-w-2xl mx-auto">Add new trekking events and manage the ones you've already listed.</p>
+</section>
+
+<main class="max-w-6xl mx-auto w-full px-6 py-12 flex-grow">
+
+  <!-- Add Trek Form -->
+  <div id="addTrekSection">
+    <h2 class="text-3xl font-bold text-green-800 mb-6">Add New Trek</h2>
+    <div id="formMsg" class="hidden mb-4 px-4 py-3 rounded-lg text-sm font-medium"></div>
+
+    <div class="fs">
+      <h3 class="text-lg font-bold text-green-700 mb-4">&#128205; Basic Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div><label class="fl">Trek Name *</label><input class="fi" type="text" id="trekName" placeholder="e.g. Kedarnath Trek"></div>
+        <div><label class="fl">Location *</label><input class="fi" type="text" id="location" placeholder="e.g. Kedarnath, Uttarakhand"></div>
+        <div><label class="fl">State *</label><input class="fi" type="text" id="state" placeholder="e.g. Uttarakhand"></div>
+        <div><label class="fl">Difficulty Level *</label>
+          <select class="fi" id="difficulty"><option value="">-- Select --</option><option value="Easy">Easy</option><option value="Moderate">Moderate</option><option value="Difficult">Difficult</option><option value="Extreme">Extreme</option></select>
+        </div>
+        <div class="md:col-span-2"><label class="fl">Description *</label><textarea class="fi" id="description" rows="3" placeholder="Describe the trek experience, highlights, route overview..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="fs">
+      <h3 class="text-lg font-bold text-green-700 mb-4">&#129506; Trek Details</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div><label class="fl">Duration *</label><input class="fi" type="text" id="duration" placeholder="e.g. 3 Days / 2 Nights"></div>
+        <div><label class="fl">Distance *</label><input class="fi" type="text" id="distance" placeholder="e.g. 18 km"></div>
+        <div><label class="fl">Max Altitude</label><input class="fi" type="text" id="altitude" placeholder="e.g. 3583 m"></div>
+        <div><label class="fl">Starting Point *</label><input class="fi" type="text" id="startingPoint" placeholder="e.g. Gaurikund"></div>
+        <div><label class="fl">Ending Point *</label><input class="fi" type="text" id="endingPoint" placeholder="e.g. Kedarnath Temple"></div>
+        <div><label class="fl">Trek Image URL</label><input class="fi" type="url" id="imageUrl" placeholder="https://images.unsplash.com/..."></div>
+      </div>
+    </div>
+
+    <div class="fs">
+      <h3 class="text-lg font-bold text-green-700 mb-4">&#128197; Schedule &amp; Pricing</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div><label class="fl">Start Date *</label><input class="fi" type="date" id="startDate"></div>
+        <div><label class="fl">End Date *</label><input class="fi" type="date" id="endDate"></div>
+        <script>
+          (function(){
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').min = today;
+            document.getElementById('endDate').min = today;
+            document.getElementById('startDate').addEventListener('change', function(){
+              var sd = this.value || today;
+              document.getElementById('endDate').min = sd;
+              // If end date is before new start date, clear it
+              var ed = document.getElementById('endDate').value;
+              if(ed && ed < sd){ document.getElementById('endDate').value = ''; }
+            });
+            document.getElementById('endDate').addEventListener('change', function(){
+              var sd = document.getElementById('startDate').value;
+              if(sd && this.value < sd){
+                alert('End Date cannot be before Start Date. Please select a valid end date.');
+                this.value = '';
+              }
+            });
+          })();
+        </script>
+        <div><label class="fl">Meeting Time *</label><input class="fi" type="time" id="meetingTime"></div>
+        <div><label class="fl">Max Participants *</label><input class="fi" type="number" id="maxParticipants" placeholder="e.g. 25" min="1"></div>
+        <div><label class="fl">Price per Person (&#8377;) *</label><input class="fi" type="number" id="price" placeholder="e.g. 4500" min="0"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+        <div><label class="fl">Includes</label><textarea class="fi" id="includes" rows="2" placeholder="Accommodation, Meals, Guide, First Aid..."></textarea></div>
+        <div><label class="fl">Excludes</label><textarea class="fi" id="excludes" rows="2" placeholder="Travel to start point, Personal expenses..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="fs">
+      <h3 class="text-lg font-bold text-green-700 mb-4">&#128100; Organizer Details</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div><label class="fl">Your Name *</label><input class="fi" type="text" id="organizerName" placeholder="Full name"></div>
+        <div><label class="fl">Your Email *</label><input class="fi" type="email" id="organizerEmail" placeholder="organizer@email.com"></div>
+        <div><label class="fl">Your Phone *</label><input class="fi" type="tel" id="organizerPhone" placeholder="+91 9876543210"></div>
+      </div>
+    </div>
+
+    <button id="submitBtn" onclick="submitTrek()" class="bg-green-700 text-white px-10 py-3 rounded-lg hover:bg-green-600 transition text-lg font-medium w-full md:w-auto">
+      &#128640; Add Trek
+    </button>
+  </div>
+
+  <!-- Your Listed Treks -->
+  <div class="mt-16">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold text-green-800">Your Listed Treks</h2>
+      <button onclick="loadMyTreks()" class="text-green-700 border border-green-700 px-4 py-2 rounded-lg hover:bg-green-50 transition text-sm font-medium">&#128260; Refresh</button>
+    </div>
+    <div id="orgTreksList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <p class="text-gray-400 col-span-3 text-center py-10">Loading your treks...</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer bg-green-900 text-white mt-12">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+    <div><h2 class="text-xl font-bold mb-4">TrekFast</h2><p>We provide curated trekking experiences across the most beautiful trails.</p></div>
+    <div><h2 class="text-xl font-bold mb-4">Quick Links</h2><ul class="space-y-2"><li><a href="orgnizerhome.html" class="hover:underline">Home</a></li><li><a href="orgtreks.html" class="hover:underline">Trek</a></li><li><a href="yourtrek.html" class="hover:underline">Your Trek</a></li><li><a href="dashboard.html" class="hover:underline">Dashboard</a></li><li><a href="about.html" class="hover:underline">About Us</a></li><li><a href="contact.html" class="hover:underline">Contact Us</a></li></ul></div>
+    <div><h2 class="text-xl font-bold mb-4">Contact Us</h2><p>Email: info@trekfast.com</p><p>Phone: +91 9876543210</p><p>Location: Pune, Maharashtra, India</p></div>
+    <div><h2 class="text-xl font-bold mb-4">Follow Us</h2><div class="flex gap-4"><a href="#" class="hover:text-green-400">Facebook</a><a href="#" class="hover:text-green-400">Instagram</a><a href="#" class="hover:text-green-400">Twitter</a></div></div>
+  </div>
+  <div class="text-center text-gray-300 mt-6 border-t border-gray-700 pt-4 mb-20">&copy; 2026 TrekFast. All rights reserved.</div>
+</footer>
+
+<script>
+const API = "https://YOUR_VERCEL_BACKEND_URL";
+const diffColors = { Easy:"bg-green-100 text-green-800", Moderate:"bg-yellow-100 text-yellow-800", Difficult:"bg-orange-100 text-orange-800", Extreme:"bg-red-100 text-red-800" };
+
+function scrollToForm(){ document.getElementById("addTrekSection").scrollIntoView({behavior:"smooth"}); }
+
+function showMsg(msg, ok=true) {
+  const el=document.getElementById("formMsg");
+  el.textContent=msg;
+  el.className=`mb-4 px-4 py-3 rounded-lg text-sm font-medium ${ok?"bg-green-100 text-green-800":"bg-red-100 text-red-800"}`;
+  el.classList.remove("hidden");
+  setTimeout(()=>el.classList.add("hidden"),5000);
+}
+
+async function submitTrek() {
+  const btn=document.getElementById("submitBtn");
+  const fields={
+    trekName: document.getElementById("trekName").value.trim(),
+    location: document.getElementById("location").value.trim(),
+    state: document.getElementById("state").value.trim(),
+    description: document.getElementById("description").value.trim(),
+    difficulty: document.getElementById("difficulty").value,
+    duration: document.getElementById("duration").value.trim(),
+    distance: document.getElementById("distance").value.trim(),
+    altitude: document.getElementById("altitude").value.trim(),
+    startingPoint: document.getElementById("startingPoint").value.trim(),
+    endingPoint: document.getElementById("endingPoint").value.trim(),
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
+    meetingTime: document.getElementById("meetingTime").value,
+    maxParticipants: document.getElementById("maxParticipants").value,
+    price: document.getElementById("price").value,
+    includes: document.getElementById("includes").value.trim(),
+    excludes: document.getElementById("excludes").value.trim(),
+    organizerName: document.getElementById("organizerName").value.trim(),
+    organizerEmail: document.getElementById("organizerEmail").value.trim(),
+    organizerPhone: document.getElementById("organizerPhone").value.trim(),
+    imageUrl: document.getElementById("imageUrl").value.trim(),
+  };
+  const required=["trekName","location","state","description","difficulty","duration","distance","startingPoint","endingPoint","startDate","endDate","meetingTime","maxParticipants","price","organizerName","organizerEmail","organizerPhone"];
+  for(const k of required){ if(!fields[k]){ showMsg(`Please fill in: ${k.replace(/([A-Z])/g,' $1')}`,false); return; } }
+  if(fields.startDate > fields.endDate){ showMsg("Start Date cannot be greater than End Date. Please fix the dates.",false); return; }
+  btn.disabled=true; btn.innerHTML='Adding... <span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span>';
+  try {
+    const res=await fetch(`${API}/addtrek`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(fields)});
+    const data=await res.json();
+    if(res.ok){ showMsg("&#9989; Trek added successfully! Trekkers can now discover your adventure.",true); document.querySelectorAll(".fi").forEach(el=>el.value=""); loadMyTreks(); }
+    else showMsg(data.message||"Failed to add trek.",false);
+  } catch { showMsg("Server error. Please try again.",false); }
+  finally { btn.disabled=false; btn.innerHTML="&#128640; Add Trek"; }
+}
+
+async function loadMyTreks() {
+  // Get organizer email from localStorage (set at login) or from input
+  const email = localStorage.getItem("organizerEmail") || document.getElementById("organizerEmail").value.trim();
+  const container = document.getElementById("orgTreksList");
+  if (!email) { container.innerHTML=`<p class="text-gray-400 col-span-3 text-center py-10">Fill your email above and add a trek to see your listings here.</p>`; return; }
+  container.innerHTML=`<p class="text-gray-400 col-span-3 text-center animate-pulse py-10">Loading your treks...</p>`;
+  try {
+    const res=await fetch(`${API}/getorganizertreks/${encodeURIComponent(email)}`);
+    const treks=await res.json();
+    if(!treks.length){ container.innerHTML=`<p class="text-gray-400 col-span-3 text-center py-10">No treks listed yet. Add your first trek above!</p>`; return; }
+    container.innerHTML=treks.map(t=>`
+      <div class="trek-card">
+        <div class="relative h-44 overflow-hidden">
+          <img src="${t.imageUrl||'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80'}" alt="${t.trekName}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80'">
+          <span class="diff-badge absolute top-3 right-3 ${diffColors[t.difficulty]||'bg-gray-100 text-gray-700'}">${t.difficulty}</span>
+        </div>
+        <div class="p-4">
+          <h3 class="text-base font-bold text-gray-800 mb-1">${t.trekName}</h3>
+          <p class="text-green-700 text-xs font-medium mb-3">&#128205; ${t.location}, ${t.state}</p>
+          <div class="grid grid-cols-2 gap-1 text-xs text-gray-600 mb-3">
+            <span>&#9201; ${t.duration}</span><span>&#128101; Max ${t.maxParticipants}</span>
+            <span>&#128176; &#8377;${Number(t.price).toLocaleString('en-IN')}</span>
+            <span>&#128197; ${new Date(t.startDate).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="location.href='dashboard.html'" class="flex-1 text-xs border border-green-700 text-green-700 py-2 rounded-lg hover:bg-green-50 transition font-semibold">&#128202; Bookings</button>
+            <button onclick='openEditModal(${JSON.stringify(t).replace(/'/g,"&#39;")})' class="flex-1 text-xs border border-blue-500 text-blue-600 py-2 rounded-lg hover:bg-blue-50 transition font-semibold">&#9998; Edit</button>
+            <button onclick="deleteTrek('${t._id}')" class="flex-1 text-xs bg-red-50 text-red-600 border border-red-200 py-2 rounded-lg hover:bg-red-100 transition font-semibold">&#128465; Delete</button>
+          </div>
+        </div>
+      </div>`).join("");
+  } catch { container.innerHTML=`<p class="text-red-500 col-span-3 text-center py-10">Error loading treks.</p>`; }
+}
+
+async function deleteTrek(id) {
+  if(!confirm("Delete this trek? This cannot be undone.")) return;
+  try {
+    const res=await fetch(`${API}/deletetrek/${id}`,{method:"DELETE"});
+    const data=await res.json();
+    alert(data.message); loadMyTreks();
+  } catch { alert("Error deleting trek."); }
+}
+
+// Auto-fill organizer email from localStorage if available
+window.addEventListener("DOMContentLoaded",()=>{
+  const saved=localStorage.getItem("organizerEmail");
+  if(saved){ document.getElementById("organizerEmail").value=saved; }
+  loadMyTreks();
+});
+</script>
+
+  <script>
+    function toggleMenu(){ const m=document.getElementById("mobileMenu"); m.style.display=m.style.display==="flex"?"none":"flex"; m.style.flexDirection="column"; }
+    function doLogout() {
+            localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+
+<!-- ── Edit Trek Modal ─────────────────────────────────────────────────── -->
+<div id="editModal" class="fixed inset-0 z-50 hidden" style="background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);">
+  <div class="flex items-center justify-center min-h-screen px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between rounded-t-2xl z-10">
+        <div>
+          <h2 class="text-2xl font-bold text-green-800">&#9998; Edit Trek</h2>
+          <p class="text-sm text-gray-400 mt-0.5" id="editModalSubtitle">Update your trek details</p>
+        </div>
+        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none transition">&#10005;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="px-8 py-6 space-y-6">
+        <input type="hidden" id="editTrekId">
+        <div id="editFormMsg" class="hidden px-4 py-3 rounded-lg text-sm font-medium"></div>
+
+        <!-- Basic Info -->
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-5">
+          <h3 class="text-sm font-bold text-green-700 uppercase tracking-wide mb-4">&#128205; Basic Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="fl">Trek Name *</label><input class="fi" type="text" id="editTrekName" placeholder="e.g. Kedarnath Trek"></div>
+            <div><label class="fl">Location *</label><input class="fi" type="text" id="editLocation" placeholder="e.g. Kedarnath, Uttarakhand"></div>
+            <div><label class="fl">State *</label><input class="fi" type="text" id="editState" placeholder="e.g. Uttarakhand"></div>
+            <div><label class="fl">Difficulty Level *</label>
+              <select class="fi" id="editDifficulty">
+                <option value="">-- Select --</option>
+                <option value="Easy">Easy</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Difficult">Difficult</option>
+                <option value="Extreme">Extreme</option>
+              </select>
+            </div>
+            <div class="md:col-span-2"><label class="fl">Description *</label><textarea class="fi" id="editDescription" rows="3" placeholder="Describe the trek..."></textarea></div>
+          </div>
+        </div>
+
+        <!-- Trek Details -->
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-5">
+          <h3 class="text-sm font-bold text-green-700 uppercase tracking-wide mb-4">&#129506; Trek Details</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div><label class="fl">Duration *</label><input class="fi" type="text" id="editDuration" placeholder="e.g. 3 Days / 2 Nights"></div>
+            <div><label class="fl">Distance *</label><input class="fi" type="text" id="editDistance" placeholder="e.g. 18 km"></div>
+            <div><label class="fl">Max Altitude</label><input class="fi" type="text" id="editAltitude" placeholder="e.g. 3583 m"></div>
+            <div><label class="fl">Starting Point *</label><input class="fi" type="text" id="editStartingPoint" placeholder="e.g. Gaurikund"></div>
+            <div><label class="fl">Ending Point *</label><input class="fi" type="text" id="editEndingPoint" placeholder="e.g. Kedarnath Temple"></div>
+            <div><label class="fl">Trek Image URL</label><input class="fi" type="url" id="editImageUrl" placeholder="https://..."></div>
+          </div>
+        </div>
+
+        <!-- Schedule & Pricing -->
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-5">
+          <h3 class="text-sm font-bold text-green-700 uppercase tracking-wide mb-4">&#128197; Schedule &amp; Pricing</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div><label class="fl">Start Date *</label><input class="fi" type="date" id="editStartDate"></div>
+            <div><label class="fl">End Date *</label><input class="fi" type="date" id="editEndDate"></div>
+            <script>
+              (function(){
+                var today = new Date().toISOString().split('T')[0];
+                document.getElementById('editStartDate').min = today;
+                document.getElementById('editEndDate').min = today;
+                document.getElementById('editStartDate').addEventListener('change', function(){
+                  var sd = this.value || today;
+                  document.getElementById('editEndDate').min = sd;
+                  var ed = document.getElementById('editEndDate').value;
+                  if(ed && ed < sd){ document.getElementById('editEndDate').value = ''; }
+                });
+                document.getElementById('editEndDate').addEventListener('change', function(){
+                  var sd = document.getElementById('editStartDate').value;
+                  if(sd && this.value < sd){
+                    alert('End Date cannot be before Start Date. Please select a valid end date.');
+                    this.value = '';
+                  }
+                });
+              })();
+            </script>
+            <div><label class="fl">Meeting Time *</label><input class="fi" type="time" id="editMeetingTime"></div>
+            <div><label class="fl">Max Participants *</label><input class="fi" type="number" id="editMaxParticipants" min="1"></div>
+            <div><label class="fl">Price per Person (&#8377;) *</label><input class="fi" type="number" id="editPrice" min="0"></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div><label class="fl">Includes</label><textarea class="fi" id="editIncludes" rows="2" placeholder="Accommodation, Meals, Guide..."></textarea></div>
+            <div><label class="fl">Excludes</label><textarea class="fi" id="editExcludes" rows="2" placeholder="Travel, Personal expenses..."></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-5 flex items-center justify-end gap-3 rounded-b-2xl">
+        <button onclick="closeEditModal()" class="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium text-sm">Cancel</button>
+        <button id="editSaveBtn" onclick="saveEditTrek()" class="bg-green-700 text-white px-8 py-2.5 rounded-lg hover:bg-green-600 transition font-semibold text-sm">
+          &#9989; Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Edit Trek Modal Logic ────────────────────────────────────────────────
+  function openEditModal(trek) {
+    document.getElementById("editTrekId").value        = trek._id;
+    document.getElementById("editModalSubtitle").textContent = trek.trekName;
+    document.getElementById("editTrekName").value      = trek.trekName || "";
+    document.getElementById("editLocation").value      = trek.location || "";
+    document.getElementById("editState").value         = trek.state || "";
+    document.getElementById("editDifficulty").value   = trek.difficulty || "";
+    document.getElementById("editDescription").value  = trek.description || "";
+    document.getElementById("editDuration").value     = trek.duration || "";
+    document.getElementById("editDistance").value     = trek.distance || "";
+    document.getElementById("editAltitude").value     = trek.altitude || "";
+    document.getElementById("editStartingPoint").value= trek.startingPoint || "";
+    document.getElementById("editEndingPoint").value  = trek.endingPoint || "";
+    document.getElementById("editImageUrl").value     = trek.imageUrl || "";
+    document.getElementById("editStartDate").value    = trek.startDate ? trek.startDate.slice(0, 10) : "";
+    document.getElementById("editEndDate").value      = trek.endDate ? trek.endDate.slice(0, 10) : "";
+    document.getElementById("editMeetingTime").value  = trek.meetingTime || "";
+    document.getElementById("editMaxParticipants").value = trek.maxParticipants || "";
+    document.getElementById("editPrice").value        = trek.price || "";
+    document.getElementById("editIncludes").value     = trek.includes || "";
+    document.getElementById("editExcludes").value     = trek.excludes || "";
+    document.getElementById("editFormMsg").classList.add("hidden");
+    document.getElementById("editModal").classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeEditModal() {
+    document.getElementById("editModal").classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+
+  // Close modal on backdrop click
+  document.getElementById("editModal").addEventListener("click", function(e) {
+    if (e.target === this) closeEditModal();
+  });
+
+  function showEditMsg(msg, ok = true) {
+    const el = document.getElementById("editFormMsg");
+    el.textContent = msg;
+    el.className = `px-4 py-3 rounded-lg text-sm font-medium ${ok ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`;
+    el.classList.remove("hidden");
+    if (ok) setTimeout(() => el.classList.add("hidden"), 4000);
+  }
+
+  async function saveEditTrek() {
+    const id = document.getElementById("editTrekId").value;
+    const btn = document.getElementById("editSaveBtn");
+
+    const fields = {
+      trekName:       document.getElementById("editTrekName").value.trim(),
+      location:       document.getElementById("editLocation").value.trim(),
+      state:          document.getElementById("editState").value.trim(),
+      description:    document.getElementById("editDescription").value.trim(),
+      difficulty:     document.getElementById("editDifficulty").value,
+      duration:       document.getElementById("editDuration").value.trim(),
+      distance:       document.getElementById("editDistance").value.trim(),
+      altitude:       document.getElementById("editAltitude").value.trim(),
+      startingPoint:  document.getElementById("editStartingPoint").value.trim(),
+      endingPoint:    document.getElementById("editEndingPoint").value.trim(),
+      imageUrl:       document.getElementById("editImageUrl").value.trim(),
+      startDate:      document.getElementById("editStartDate").value,
+      endDate:        document.getElementById("editEndDate").value,
+      meetingTime:    document.getElementById("editMeetingTime").value,
+      maxParticipants:document.getElementById("editMaxParticipants").value,
+      price:          document.getElementById("editPrice").value,
+      includes:       document.getElementById("editIncludes").value.trim(),
+      excludes:       document.getElementById("editExcludes").value.trim(),
+    };
+
+    const required = ["trekName","location","state","description","difficulty","duration","distance","startingPoint","endingPoint","startDate","endDate","meetingTime","maxParticipants","price"];
+    for (const k of required) {
+      if (!fields[k]) {
+        showEditMsg(`Please fill in: ${k.replace(/([A-Z])/g, " $1")}`, false);
+        return;
+      }
+    }
+    if (fields.startDate > fields.endDate) {
+      showEditMsg("Start Date cannot be greater than End Date. Please fix the dates.", false);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = 'Saving... <span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span>';
+
+    try {
+      const res = await fetch(`${API}/updatetrek/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showEditMsg("&#9989; Trek updated successfully!", true);
+        setTimeout(() => { closeEditModal(); loadMyTreks(); }, 1200);
+      } else {
+        showEditMsg(data.message || "Failed to update trek.", false);
+      }
+    } catch {
+      showEditMsg("Server error. Please try again.", false);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = "&#9989; Save Changes";
+    }
+  }
+</script>
+</html>
