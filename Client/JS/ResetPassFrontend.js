@@ -19,7 +19,7 @@ async function sendResetOTP() {
   status.classList.add("hidden");
 
   try {
-    const res = await fetch("https://your-backend-service.onrender.com/api/send-reset-otp", {
+    const res = await fetch("http://localhost:3000/send-reset-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, userType: getUserType() })

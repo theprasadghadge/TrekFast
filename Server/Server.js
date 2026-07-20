@@ -17,10 +17,14 @@ mongoose
   .then(() => console.log("Database Connection Successful"))
   .catch((err) => console.error("MongoDB Connection Error", err));
 
+// Test Route
+app.get("/", (req, res) => {
+  res.send("✅ TrekFast backend is running!");
+});
+
 // Routes
 app.use(route);
 
-// Test Route
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

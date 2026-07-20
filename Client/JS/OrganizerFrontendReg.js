@@ -4,7 +4,7 @@ async function getOTP() {
   if (!email) return alert("Enter your email");
 
   try {
-    const res = await fetch("https://your-backend-service.onrender.com/api/sendotp", {
+    const res = await fetch("http://localhost:3000/sendotp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })

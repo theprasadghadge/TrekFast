@@ -21,7 +21,7 @@ form.addEventListener("submit", async function (e) {
 
   try {
 
-    const response = await fetch("https://your-backend-service.onrender.com/api/contact", {
+    const response = await fetch("http://localhost:3000/contact", {
       method: "POST",
       headers: {
         "Content-Type":"application/json"
