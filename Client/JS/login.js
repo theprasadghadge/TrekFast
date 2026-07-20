@@ -24,7 +24,7 @@ form.addEventListener("submit", async (e) => {
   loginBtn.innerHTML = `Logging in... <span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-left:4px;"></span>`;
 
   try {
-    const res  = await fetch("http://localhost:3000/login", {
+    const res  = await fetch("https://your-backend-service.onrender.com/login", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ email, password, userType }),
