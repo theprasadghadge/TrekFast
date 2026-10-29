@@ -277,7 +277,7 @@
   <script>
     // ── Read trek data from URL params ────────────────────────────────────────
     // trek.html passes: ?trekId=...&trekName=...&price=...&maxPax=...&image=...&location=...&duration=...&difficulty=...
-    const API = "http://localhost:3000";
+    const API = "https://trekfast.onrender.com";
     const params = new URLSearchParams(window.location.search);
 
     const _trek = {
@@ -468,7 +468,7 @@
 
   <!-- ── Sidebar: My Bookings ── -->
   <script>
-    const SB_API    = "http://localhost:3000";
+    const SB_API = "https://trekfast.onrender.com";
     const SB_DEFIMG = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=60";
 
     window.addEventListener("DOMContentLoaded", () => {

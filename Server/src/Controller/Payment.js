@@ -74,7 +74,7 @@ function buildTrekkerEmailHTML(booking, paymentId) {
     </div>
   </td></tr>
   <tr><td style="padding:0 40px 32px;text-align:center;">
-    <a href="http://localhost:5500/Client/HTML/mybooking.html" style="display:inline-block;background:linear-gradient(135deg,#15803d,#16a34a);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:700;">View My Bookings &#8594;</a>
+    <a href="https://trekfast-1.onrender.com/mybooking.html" style="display:inline-block;background:linear-gradient(135deg,#15803d,#16a34a);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:700;">View My Bookings &#8594;</a>
   </td></tr>
   <tr><td style="padding:0 40px;"><div style="border-top:1px solid #e5e7eb;"></div></td></tr>
   <tr><td style="padding:24px 40px;text-align:center;">
@@ -149,7 +149,7 @@ function buildOrganizerEmailHTML(booking, paymentId) {
     </div>
   </td></tr>
   <tr><td style="padding:0 40px 32px;text-align:center;">
-    <a href="http://localhost:5500/Client/HTML/dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#2563eb);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:700;">View Dashboard &#8594;</a>
+    <a href="https://trekfast-1.onrender.com/dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#2563eb);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:700;">View Dashboard &#8594;</a>
   </td></tr>
   <tr><td style="padding:0 40px;"><div style="border-top:1px solid #e5e7eb;"></div></td></tr>
   <tr><td style="padding:24px 40px;text-align:center;">
